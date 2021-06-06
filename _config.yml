@@ -1,0 +1,85 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+title: pepe berba
+email:  
+description: > # this means to ignore newlines until "baseurl:"
+  stats, security, and crypto
+# Link settings
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://pberba.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+permalink: pretty
+
+author:
+  name             : "Pepe Berba"
+  avatar           : "profile.png"
+  bio              : "Cloud Security at Thinking Machines| GMON, CCSK | Ex-Machine Learning Researcher and Ex-SOC Engineer"
+  location         : "PH"
+  github           : "pberba"
+  linkedin         : pberba
+  twitter          : "__pberba__"
+  medium           : "pberba"
+
+
+rss: rss
+
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  # - jekyll-paginate
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+# Kramdown settings
+
+kramdown:
+  input: GFM
+
+# Highlighter settings
+highlighter: rouge
+
+# Disqus
+disqus:
+  shortname: 
+
+# Google analytics
+google_analytics: UA-167859587-1 
+
+# Publish future
+future: true
+# If you want to link only specific pages in your header, uncomment
+# this and add the path to the pages in order as they should show up
+#header_pages:
+#  - about.html
+  #- /cv/index.md
+  #- /notebook/index.md
+  #- /projects/index.md
+
+# Include this line so that travis will not explode
+exclude: [vendor]
+
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list
+# to override the default setting.
+# exclude:
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
