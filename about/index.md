@@ -6,11 +6,7 @@ title: About me
 
 Hi, I'm Pepe Berba GMON, CCSK. 
 
-I write about stats, security, and crypto. 
-
-I've been bouncing back and forth between cybersecurity machine learning for the past few years. 
-
-In my free-time, I practice penetration testing and forensics, and I'm targetting to get an OSCP in the future.
+I write about stats, security, and cryptography. I've been bouncing back and forth between cybersecurity and machine learning for the past few years. In my free-time, I practice penetration testing and forensics, and I'm targetting to get an OSCP in the future.
 
 I'm a hobbyist cryptographer. I've had a few units of cryptography and number theory in college and some experience solving crypto challenges in CTFs. Nothing serious.
 
@@ -19,9 +15,9 @@ Background
 ----------
 
 I'm currently a Cloud Security Engineer and an ex-Machine Learning Researcher at [Thinking Machines Data
-Science](https://thinkingmachin.es/), a data science startup in the Philippines. I'm also trying to finishing my masters degree in data science from the University of the Philippines, School of Statistics.
+Science](https://thinkingmachin.es/), a data science startup in the Philippines. I'm also trying to finish my masters degree in data science from the University of the Philippines, School of Statistics.
 
-Previously, I worked in in a Redrock IT Securit, a cybersecurity startup based in the Philippines. I was part of the founding team of the SOC and had to wear many hats: deploying SIEMs from scratch using ELK, developing integrations and custom scripts for the operations, configuring rules and alerts for threat detection, and monitoring and analyzing alerts.
+Previously, I worked in a Redrock IT Security, a cybersecurity startup based in the Philippines. I was part of the founding team of the SOC and had to wear many hats: deploying SIEMs from scratch using ELK, developing integrations and custom scripts for the operations, configuring rules and alerts for threat detection, and monitoring and analyzing alerts.
 
 
 Certifications 
@@ -77,7 +73,7 @@ A low-level Python client for Pulsedive API, an analyst-centric threat intellige
 =============
 
 
- When I'm free, I try to solve crypto challenges in CTFs with the <a href="https://hackstreetboys.ph/"> hackstreetboys </a>.
+When I'm free, I try to solve crypto challenges in CTFs with the <a href="https://hackstreetboys.ph/"> hackstreetboys </a>.
 
 My write-ups are in my [ctf-solutions](https://github.com/pberba/ctf-solutions) repository, but I will try to migrate some of them in the [crypto](/crypto) section.
 
