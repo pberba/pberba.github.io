@@ -531,7 +531,7 @@ WHERE
 This look for processes with sockets that have established connections or has a listening port.
 
 
-<pre class='highlight'><code style='white-space: NONE;'>
+<pre class='highlight' style="white-space:pre;"><code style="white-space:pre;">
 +-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
 | pid   | remote_address  | local_port | remote_port | state       | name            | cmdline                                | uid  | username |
 +-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
