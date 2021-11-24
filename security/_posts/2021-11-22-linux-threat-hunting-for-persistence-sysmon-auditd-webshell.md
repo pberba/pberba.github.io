@@ -531,7 +531,7 @@ WHERE
 This look for processes with sockets that have established connections or has a listening port.
 
 
-```
+<pre class='highlight'><code style='white-space: NONE;'>
 +-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
 | pid   | remote_address  | local_port | remote_port | state       | name            | cmdline                                | uid  | username |
 +-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
@@ -542,8 +542,7 @@ This look for processes with sockets that have established connections or has a 
 | 17770 | 6.7.8.9         | 22         | 20901       | ESTABLISHED | sshd            | sshd: user@pts/0                       | 1000 | user     |
 | 17776 | 1.2.3.4         | 51998      | 1337        | ESTABLISHED | bash            | bash                                   | 33   | www-data |
 +-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
-```
-
+</code></pre>
 
 Notice we that we see exposed port `22` and port `80` which is normal. We see outbound connections for some binaries used by GCP (my VM is hosted in GCP) as well as the `auditbeat` service that ships my logs to the SIEM. 
 
