@@ -1,0 +1,18 @@
+{% if page.author and site.data.authors[page.author] %}
+  {% assign author = site.data.authors[page.author] %}{% else %}{% assign author = site.author %}
+{% endif %}
+
+<footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">{{ site.title | escape }} | {{ site.description | escape }}  
+
+	&nbsp
+
+	{% include mini-social.html %}
+
+</h2>
+
+
+</footer>

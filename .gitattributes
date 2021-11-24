@@ -1,0 +1,4 @@
+*.html diff
+*.yml  diff
+*.scss diff
+*.md diff

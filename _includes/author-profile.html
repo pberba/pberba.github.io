@@ -1,0 +1,15 @@
+{% if page.author and site.data.authors[page.author] %}
+  {% assign author = site.data.authors[page.author] %}{% else %}{% assign author = site.author %}
+{% endif %}
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  <div class="author__avatar">
+        <img src="/assets/profile.png" class="author__avatar" alt="{{ author.name }}">
+  </div>
+
+  <div class="author__content">
+    <h3 class="author__name">{{ author.name }}  </h3> 
+    {% if author.bio %}<p class="author__bio">{{ author.bio }}</p>{% endif %}
+  </div>
+</div>

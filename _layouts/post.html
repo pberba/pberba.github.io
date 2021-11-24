@@ -1,0 +1,61 @@
+---
+layout: default
+---
+
+<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+
+     <h3> <a href="/posts"> posts </a> > <a href="/{{ page.category }}">{{ page.category | escape }}</a></h3>
+
+    <h1 class="post-title" itemprop="name headline">{{ page.title | escape }}</h1>
+
+    {% if page.subtitle %}
+      <p> {{ page.subtitle | escape }}</p>
+    {% endif %}
+
+    <p class="post-meta">
+
+      <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+        {{ page.date | date: date_format }}
+      </time>
+      {% if page.author %}
+        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>
+      {% endif %}
+
+      &nbsp {% include mini-social.html %}
+    </p> 
+  </header>
+
+
+  <div class="post-content" itemprop="articleBody">
+    {% if page.header-img-direct %}
+      <img src="{{page.header-img-direct}}" alt="">
+      </br>
+    {% endif %}
+
+    {% if page.toc %}
+      <aside id="sidebar_toc_body" class="sidebar_toc_body">
+        <nav class="toc">
+          <header><h2 class="nav__title"><i class="fa fa-{{ page.toc_icon | default: 'file-text' }}"></i> Table of Contents </h2></header>
+          {% include toc.html sanitize=true html=content h_min=0 h_max=4 skip_no_ids=true class="toc__menu" %}
+        </nav>
+      </aside>
+    {% endif %}
+
+
+    {{ content }}
+  </div>
+
+  <hr/>
+  <br/>
+
+  {% include author-profile.html %}
+
+
+
+  {% if site.disqus.shortname %}
+    {% include disqus_comments.html %}
+  {% endif %}
+</article>

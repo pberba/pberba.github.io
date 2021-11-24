@@ -1,0 +1,49 @@
+---
+layout: default
+---
+
+<div class="home">
+
+  {{ content }}
+
+&nbsp;
+
+<hr>
+
+&nbsp;
+
+<h2>Recent Posts</h2>
+
+<ul class="post-list">
+{% for post in site.posts limit:3 %}
+  <li>
+    {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+    <span class="post-meta">{{ post.date | date: date_format }} &verbar; {{ post.category | upcase }}</span>
+
+    <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3>
+    <p style="color:#828282">{{ post.description }}</p>
+  </li>
+{% endfor %}
+</ul>
+</div>
+
+&nbsp;
+
+
+<hr>
+
+&nbsp;
+
+
+<h2>Archive</h2>
+
+Here are all the blog posts I've written so far.
+
+<ul>
+  {% for post in site.posts %}
+    <li>
+        <span>{{ post.date |  date: "%Y/%m/%d" }}</span> » <a href="{{ post.url }}" title="{{ post.title | escape }}">{{ post.title }}</a> ({{ post.category }})
+    </li>
+  {% endfor %}
+</ul>
+
