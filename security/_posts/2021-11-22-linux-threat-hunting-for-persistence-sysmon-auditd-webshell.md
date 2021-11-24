@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, and Webshells"
-mini_title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, and Webshells"
+title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery, and Webshells"
+mini_title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery, and Webshells"
 date: 2021-11-22
 category: security
 comments: true
@@ -145,6 +145,41 @@ We see from the diagram from `linuxsecurity.com` that Sysmon works on top of eBP
 For example, in sysmon, we can look for a FileCreate event with a specific `TargetFilename`. This is more flexible because you can define rules based on patterns or keywords and look for files that do no exist yet. However, string matches such as `/etc/passwd` can fail if the target name is not exactly that string.
 
 Unlike in auditd, what is being watched are actions on the inodes of the files and directories defined. This means that there is no ambiguity what specific files to watch. You can even look for read access to specific files. However, because it watches based on inodes, the files have to exist what the auditd service is started. This means you cannot watch files based on certain patterns like `<home>/.ssh/authorized_keys`
+
+
+#### 0.3 osquery
+
+Osquery allows us to investigate our endpoints using SQL queries. This simplifies the task of investigating and collecting evidence.
+
+Moreover, when paired with management interface like [fleetdm](https://github.com/fleetdm/fleet) allows you to take baselines of your environments and even hunt for adversaries.
+
+An example from a future blog post is looking for accounts that have a password set. If you expect your engineers to always SSH via public key, then you should not see active passwords.
+
+
+We can get this information using this query  
+```sql
+SELECT password_status, username, last_change
+FROM shadow 
+WHERE password_status = 'active';
+```
+
+And get results for all your fleet something similar to this
+
+```
++-----------------+----------+-------------+
+| password_status | username | last_change |
++-----------------+----------+-------------+
+| active          | www-data | 18953       |
++-----------------+----------+-------------+\
+```
+
+Now why does `www-data` have a password? Hmm...
+
+
+Installation instructions can be found in the [official docs](https://osquery.io/downloads/official/5.0.1)
+
+Once installed simply run `osqueryi` and run the SQL queries.
+
 
 
 ### 1 Server Software Component: Web Shell
@@ -450,23 +485,23 @@ Now with this knowledge, we can bypass `T1505.003`  sysmon rule. By running `sys
 Just for an exercise, if we want to replicate our `detect_execve_www` in sysmon, we can use the following rule
 
 ```xml
-	<RuleGroup name="" groupRelation="or">
-	  <ProcessCreate onmatch="include">
-	    <Rule name="detect_shell_www" groupRelation="and">
-	      <User condition="is">www-data</User>
-	      <Image condition="contains any">/bin/bash;/bin/dash;/bin/sh;whoami</Image>
-	    </Rule>
-	  </ProcessCreate>
-	</RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <ProcessCreate onmatch="include">
+        <Rule name="detect_shell_www" groupRelation="and">
+          <User condition="is">www-data</User>
+          <Image condition="contains any">/bin/bash;/bin/dash;/bin/sh;whoami</Image>
+        </Rule>
+      </ProcessCreate>
+    </RuleGroup>
 ```
 
 And if we want to do basic file integrity monitoring with sysmon we can use
 
 ```xml
 <FileCreate onmatch="include">
-	<Rule name="change_www" groupRelation="or">
-		<TargetFilename condition="begin with">/var/www/html</TargetFilename> 
-	</Rule>
+    <Rule name="change_www" groupRelation="or">
+        <TargetFilename condition="begin with">/var/www/html</TargetFilename> 
+    </Rule>
 </FileCreate>
 ```
 
@@ -477,9 +512,48 @@ For more information about writing your own sysmon rules you can look at:
 *   [https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml](https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml)
 *   [https://github.com/microsoft/MSTIC-Sysmon](https://github.com/microsoft/MSTIC-Sysmon)
 
+#### 1.6 Hunting for web shells using osquery
+
+For osquery, we might not be able to "find" the web shells itself, but we might be able to find evidence of the webshell. If an attacker uses a web shell, it is possible they will try to establish a reverse shell. If so, we should be an outbound connection from the web server to the attacker. 
+
+```sql
+SELECT pid, remote_address, local_port, remote_port, s.state, p.name, p.cmdline, p.uid, username  
+FROM process_open_sockets  AS s 
+JOIN processes AS p 
+USING(pid) 
+JOIN users 
+USING(uid)
+WHERE 
+    s.state = 'ESTABLISHED' 
+    OR s.state = 'LISTEN';
+```
+
+This look for processes with sockets that have established connections or has a listening port.
+
+
+```
++-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
+| pid   | remote_address  | local_port | remote_port | state       | name            | cmdline                                | uid  | username |
++-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
+| 14209 | 0.0.0.0         | 22         | 0           | LISTEN      | sshd            | /usr/sbin/sshd -D                      | 0    | root     |
+| 468   | 0.0.0.0         | 80         | 0           | LISTEN      | nginx           | nginx: worker process                  | 33   | www-data |
+| 461   | 74.125.200.95   | 51434      | 443         | ESTABLISHED | google_guest_ag | /usr/bin/google_guest_agent            | 0    | root     |
+| 8563  | 10.0.0.13       | 39670      | 9200        | ESTABLISHED | auditbeat       | /usr/share/auditbeat/bin/auditbeat ... | 0    | root     |
+| 17770 | 6.7.8.9         | 22         | 20901       | ESTABLISHED | sshd            | sshd: user@pts/0                       | 1000 | user     |
+| 17776 | 1.2.3.4         | 51998      | 1337        | ESTABLISHED | bash            | bash                                   | 33   | www-data |
++-------+-----------------+------------+-------------+-------------+-----------------+----------------------------------------+------+----------+
+```
+
+
+Notice we that we see exposed port `22` and port `80` which is normal. We see outbound connections for some binaries used by GCP (my VM is hosted in GCP) as well as the `auditbeat` service that ships my logs to the SIEM. 
+
+We also see an active SSH connection from `6.7.8.9` which might be normal.
+
+What should catch your eye is the connection `pid =17776`. It is an outbound connection to port `1337` running shell by `www-data`! This is probably an active reverse shell! 
+
 ### What’s next
 
-We’ve discussed basic of monitoring and logging with sysmon, auditd and auditbeats and we have used the case study of how to detect the creation and usage of web shells.
+We’ve discussed basic of monitoring and logging with sysmon, osqueryu, auditd and auditbeats and we have used the case study of how to detect the creation and usage of web shells.
 
 In the next blog post we will go through account creation and manipulation.
 
