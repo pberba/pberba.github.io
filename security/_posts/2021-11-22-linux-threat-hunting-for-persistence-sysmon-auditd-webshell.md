@@ -680,6 +680,7 @@ For some of the custom rules I make I add it in `/etc/auditbeat/audit.rules.d/cu
 # Other sources:
 
 - [https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-linux-version-of-the-windows-sysmon-tool/](https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-linux-version-of-the-windows-sysmon-tool/)
-- [https://github.com/elastic/integrations/issues/1930")[](https://github.com/elastic/integrations/issues/1930](https://github.com/elastic/integrations/issues/1930")[](https://github.com/elastic/integrations/issues/1930)
+- [https://github.com/elastic/integrations/issues/1930](https://github.com/elastic/integrations/issues/1930)
+
 
 Photo by [Brook Anderson](https://unsplash.com/@brookanderson?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/s/photos/climbing?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)
