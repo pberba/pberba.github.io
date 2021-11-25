@@ -123,11 +123,18 @@ I'm using `sysmonforlinux/buster,now 1.0.0 amd64 [installed]`
 
 While doing the research for this blogpost, my comments so far are:
 - sysmon's rule definitions are much more flexible and expressive than auditd's
-- rules depending on user input fields such as CommandLine can easily be bypassed
-- In my testing, sysmon as it is can only watch for FileCreate which is creating or overwriting of files and is not triggered for in palce modification of files (such as appending to files)
-- I've gotten some issues with the output of sysmon such as truncated rule names, I am not sure if this is a bug in sysmon or a misconfiguration on my rule definitions (most probably a mistake on my part)
+- rules depending on user input fields such as ``CommandLine` can be bypassed just like other rules using string matching.
+- In my testing, sysmon only has the event FileCreate which is triggered only when creating or overwriting of files. This means that file modification is not caught by Sysmon (such as appending to files). This means that file integrity monitoring is a weakness for Sysmon.
+- I've experienced some problems with the rule title displayed in the logs.
 - Auditd rules can filter up to the syscall level and sysmon filters based on highlevel predfined events such as `ProcessCreation`, and `FileCreate`. This means that if a particular activity that you are looking for is not mapped to a sysmon event, then you might have a hard time using sysmon to watch for it.
-- Overall, I'm very optimistic with using adopting sysmon for linux in the future but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.
+
+
+Overall, I'm very optimistic with using adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.
+
+In windows, having only `FileCreate` okay since you have other events specific to configuration changes in registry keys `RegistryEvent`, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in sysmte configuration.
+
+The good thing with sysmon, is that rules for network activities and process creation is much more expressive compared to trying to to use `a0`, `a1` for command line arguments in  auditd.
+
 
 We will discuss some of the findings in the next blog posts but some examples of bypasses are:
 - [T1087.001_LocalAccount_Commands.xml](https://github.com/microsoft/MSTIC-Sysmon/blob/main/linux/configs/attack-based/discovery/T1087.001_LocalAccount_Commands.xml) looks for commands that have `/etc/passwd` to detect account enumeration. We can use `cat /etc//passwd` to bypass this rule
