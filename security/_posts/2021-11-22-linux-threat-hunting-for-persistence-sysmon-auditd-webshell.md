@@ -14,9 +14,6 @@ header-img-direct: https://cdn-images-1.medium.com/max/800/1*Krk3Q13ICFXgX6WDZst
 toc: true
 ---
 
-
-  
-
 This blog series explores methods attackers might use to maintain persistent access to a compromised linux system. To do this, we will take an “_offense informs defense_” approach by going through techniques listed in the [MITRE ATT&CK Matrix for Linux](https://attack.mitre.org/matrices/enterprise/linux/). I will try to:
 
 1.  Give examples of how an attacker might deploy one of these backdoors
@@ -86,15 +83,12 @@ With persistence installed, the attacker no longer need to rely on exploitation 
 
 #### 0.1 File Integrity Monitoring 
 
-The configuration changes needed to setup persistence usually require the attacker to touch the machine’s disk such as creating or modifying a file. 
-
-This gives us an opportunity to catch the adversaries if we are able to lookout for file creation or modification related to special files of directories. For example, we can look for the creation of the web shell itself. This can be done by looking for changes within the web directory like `/var/www/html` . 
+The configuration changes needed to setup persistence usually require the attacker to touch the machine’s disk such as creating or modifying a file. This gives us an opportunity to catch the adversaries if we are able to lookout for file creation or modification related to special files of directories. For example, if we are trying to detect installation of services, we might want look for newly added service files in `/etc/systemd/system` and other related directories.
 
 You can use the following:
-
-*   Wazuh’s File Integrity Monitoring: [https://documentation.wazuh.com/current/learning-wazuh/detect-fs-changes.html](https://documentation.wazuh.com/current/learning-wazuh/detect-fs-changes.html)
 *   Auditbeat’s File Integrity Monitoring: [https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-file_integrity.html](https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-file_integrity.html)
 *   [auditd](https://www.redhat.com/sysadmin/configure-linux-auditing-auditd)
+*   Wazuh’s File Integrity Monitoring: [https://documentation.wazuh.com/current/learning-wazuh/detect-fs-changes.html](https://documentation.wazuh.com/current/learning-wazuh/detect-fs-changes.html)
 
 ![](https://cdn-images-1.medium.com/max/800/1*G9cEhmxGM0nJVRhGqxiuyw.png)
 
@@ -120,21 +114,21 @@ For instructions how to install sysmon refer to _appendix A01._
 
 At the time of writing this blog post, sysmon for linux has only been released for about a month now. I have no experience deploying sysmon at scale. Support for sysmon for linux is still in development for agents such as Linux Elastic Agent [see issue here](https://github.com/elastic/integrations/issues/1930)
 
-I'm using `sysmonforlinux/buster,now 1.0.0 amd64 [installed]`
+I'm using `sysmonforlinux/buster,now 1.0.0`
 
 While doing the research for this blogpost, my comments so far are:
-- sysmon's rule definitions are much more flexible and expressive than auditd's
-- rules depending on user input fields such as ``CommandLine` can be bypassed just like other rules using string matching.
-- In my testing, sysmon only has the event FileCreate which is triggered only when creating or overwriting of files. This means that file modification is not caught by Sysmon (such as appending to files). This means that file integrity monitoring is a weakness for Sysmon.
-- I've experienced some problems with the rule title displayed in the logs.
+- **sysmon's rule definitions are much more flexible and expressive than auditd's**
+- Just like other rules using string matching, rules depending on user input fields such as `CommandLine` can be bypassed.
+- **File integrity monitoring is a weakness for SysmonForLinux 1.0.0.** In my testing, sysmon only has the event FileCreate which is triggered only when creating or overwriting of files. This means that file modification is not caught by Sysmon (such as appending to files). 
+- I've experienced some problems with the truncated rule title displayed in the logs.
 - Auditd rules can filter up to the syscall level and sysmon filters based on highlevel predfined events such as `ProcessCreation`, and `FileCreate`. This means that if a particular activity that you are looking for is not mapped to a sysmon event, then you might have a hard time using sysmon to watch for it.
 
 
-Overall, I'm very optimistic with using adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.
+**Overall, I'm very optimistic with using adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.**
 
-In windows, having only `FileCreate` is okay since you have other events specific to configuration changes in registry keys `RegistryEvent`, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in system configuration.
+In windows, having only `FileCreate` is okay since you have other events specific to configuration changes, such as  `RegistryEvent` for registry keys, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in system configurations.
 
-The good thing with sysmon, is that rules for network activities and process creation is much more expressive compared to trying to to use `a0`, `a1` for command line arguments in  auditd.
+The good thing with sysmon, is that rules for network activities and process creation is much more expressive. It's more intuitive than trying to use auditd's `a0`, `a1`, ... for match on command line arguments.
 
 
 We will discuss some of the findings in the next blog posts but some examples of bypasses are:
@@ -143,16 +137,18 @@ We will discuss some of the findings in the next blog posts but some examples of
 - [T1053.003_Cron_Activity.xml](https://github.com/microsoft/MSTIC-Sysmon/blob/main/linux/configs/attack-based/persistence/T1053.003_Cron_Activity.xml) aims to monitor changes to crontab files. Using `echo "* *     * * *   root    touch /root/test" >> /etc/crontab` will bypass this because it does not create or overwrite a file, and in `Debian 10` using the standard `crontab -e` will not trigger this because the `TargetFilename` is `+/var/spool/cron/crontabs` and the extra `+` at the start causes the rule to fail.
 
 You can see the different architectures for auditd and sysmon here:
-- [Redhat CHAPTER 7. SYSTEM AUDITING](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing)
-- [Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux](https://linuxsecurity.com/features/lead-microsoft-engineer-kevin-sheldrake-brings-sysmon-to-linux)
+- [Redhat CHAPTER 7. SYSTEM AUDITING](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing) [3]
+- [Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux](https://linuxsecurity.com/features/lead-microsoft-engineer-kevin-sheldrake-brings-sysmon-to-linux) [2]
 
 We see from the diagram from `linuxsecurity.com` that Sysmon works on top of eBPF which is an interface for syscalls of the linux kernel. This serves as an abstraction when we define sysmon rules, but as a consequence, this flexibility gives attackers room to bypass some of the rules.
 
-![](https://lh3.googleusercontent.com/YogjSG51srJd4bdRCjKrCEC8q7c7qFDhSS6BUT1be7dVi7S31rlUtRMKfl95b8djxsVNT1USlr11NAK-xoOIvNukKy7ApMf_GO0VO7mbKzPjooEzmcVvzuHkuk_8P7iHQmARj9Wd)
+![Image from "Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux"](/assets/posts/20211122/00_sysmon_linux.png) 
+_Image from "Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux"[2]_
+
 
 For example, in sysmon, we can look for a FileCreate event with a specific `TargetFilename`. This is more flexible because you can define rules based on patterns or keywords and look for files that do no exist yet. However, string matches such as `/etc/passwd` can fail if the target name is not exactly that string.
 
-Unlike in auditd, what is being watched are actions on the inodes of the files and directories defined. This means that there is no ambiguity what specific files to watch. You can even look for read access to specific files. However, because it watches based on inodes, the files have to exist what the auditd service is started. This means you cannot watch files based on certain patterns like `<home>/.ssh/authorized_keys`
+Unlike in auditd, what is being watched are actions on the inodes of the files and directories. This means that there is no ambiguity on which specific files needs to be monitored. You can even look for read access to specific files. However, because it watches based on inodes, the files have to exist when the auditd service is started. This means you cannot watch files based on certain patterns like `*/.ssh/authorized_keys` 
 
 
 #### 0.3 osquery
@@ -178,7 +174,7 @@ And get results for all your fleet something similar to this
 | password_status | username | last_change |
 +-----------------+----------+-------------+
 | active          | www-data | 18953       |
-+-----------------+----------+-------------+\
++-----------------+----------+-------------+
 ```
 
 Now why does `www-data` have a password? Hmm...
@@ -196,15 +192,15 @@ Once installed simply run `osqueryi` and run the SQL queries.
 
 **MITRE**: [https://attack.mitre.org/techniques/T1505/003/](https://attack.mitre.org/techniques/T1505/003/)
 
-A web shell is backdoor installed in a web server by an attacker. Once installed, it becomes the initial foothold of the attacker, and if it’s never detected, then it becomes an easy way to persistent backdoor. 
+A web shell is backdoor installed in a web server by an attacker. Once installed, it becomes the initial foothold of the attacker, and if it’s never detected, then it becomes an easy persistent backdoor.
 
-In our example, to install a web shell we add a bad `.php` file inside`/var/www/html` Some reasons this can happen are:
+In our example, to install a web shell we add a bad `.php` file inside`/var/www/html` Some reasons this can happen are:
 
 *   the web application has a vulnerable upload API
 *   the web application has a critical RCE vulnerability
 *   the attacker has existing access that can modify the contents of the web root folder
 
-If the attacker can upload malicious files that run as php, then he can get remote access to the machine. 
+If the attacker can upload malicious files that run as php, then he can get remote access to the machine.
 
 One famous example of this is the [2017 Equifax Data Breach](https://republicans-oversight.house.gov/wp-content/uploads/2018/12/Equifax-Report.pdf). You can read the report, but here’s my TLDR: 
 
@@ -217,9 +213,9 @@ See the following resources:
 
 #### 1.2 Installing your own web shells
 
-_Note: If you want to try this out you can follow the setup instructions in the appendix A00._ 
+_Note: If you want to try this out you can follow the setup instructions in the appendix A00._
 
-Assume we already have RCE, we add a file `phpinfo.php` that will contain our web shell. 
+Assume we already have RCE, we add a file `phpinfo.php` that will contain our web shell.
 
 ```
 vi /var/www/html/phpinfo.php
@@ -248,7 +244,7 @@ Now anyone with access to `http://x.x.x.x/phpinfo.php` would be able to access t
 
 ![](https://cdn-images-1.medium.com/max/800/1*IFtn1HJNUAwxFMR26-J-_g.png)
 
-What if you don’t have shell access? You might be able to install a web shell through an unrestricted upload. Upload your php backdoor as `image.png.php` and the backdoor might be accessible on `[http://x.x.x.x/](http://x.x.x.x/)uploads/image.png.php` . 
+What if you don’t have shell access? You might be able to install a web shell through an unrestricted upload. Upload your php backdoor as `image.png.php` and the backdoor might be accessible on `http://x.x.x.x/uploads/image.png.php`.
 
 Another possible command that you can use is
 
@@ -687,8 +683,10 @@ For some of the custom rules I make I add it in `/etc/auditbeat/audit.rules.d/cu
 
 # Other sources:
 
-- [https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-linux-version-of-the-windows-sysmon-tool/](https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-linux-version-of-the-windows-sysmon-tool/)
-- [https://github.com/elastic/integrations/issues/1930](https://github.com/elastic/integrations/issues/1930)
+- [1] [https://github.com/elastic/integrations/issues/1930](https://github.com/elastic/integrations/issues/1930)
+- [2] [Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux](https://linuxsecurity.com/features/lead-microsoft-engineer-kevin-sheldrake-brings-sysmon-to-linux)
+- [3] [Redhat CHAPTER 7. SYSTEM AUDITING](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing)
 
+-----
 
 Photo by [Brook Anderson](https://unsplash.com/@brookanderson?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/s/photos/climbing?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)

@@ -8,7 +8,7 @@ permalink: /security/
 
 Notes on cyber security, network monitoring, and SOC operations from books and papers that I've read and the experience I've had working in a SOC. 
 
-Currently I'm interested in applying data science specifically to blue team cyber security.
+Currently I'm interested in applying data science specifically to blue team cyber security, and finding practical ways to do cloud security.
 
 If you want to see a directory of all posts go <a class="page-link" href="/posts">here</a>.
 
