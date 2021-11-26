@@ -132,7 +132,7 @@ While doing the research for this blogpost, my comments so far are:
 
 Overall, I'm very optimistic with using adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.
 
-In windows, having only `FileCreate` okay since you have other events specific to configuration changes in registry keys `RegistryEvent`, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in sysmte configuration.
+In windows, having only `FileCreate` is okay since you have other events specific to configuration changes in registry keys `RegistryEvent`, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in system configuration.
 
 The good thing with sysmon, is that rules for network activities and process creation is much more expressive compared to trying to to use `a0`, `a1` for command line arguments in  auditd.
 

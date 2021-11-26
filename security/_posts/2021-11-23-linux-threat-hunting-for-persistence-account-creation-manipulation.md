@@ -437,7 +437,7 @@ WHERE shell != "/usr/sbin/nologin";
 
 ##### 3.4.5 Look for commands related to account creation or manipulation
 
-Similar to what we've been setting up in auditd and sysmon. In case the attacker did not clean up the bash history, then we might be able to fnid traces of bad activities.
+Similar to what we've been setting up in auditd and sysmon. In case the attacker did not clean up the bash history, then we might be able to find traces of bad activities.
 
 This also includes checking for `authorized_keys`
 
