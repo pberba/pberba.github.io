@@ -39,19 +39,20 @@ Each persistence technique has two main parts:
 
 In this blog post we will only discuss web shell as a case study for logging and monitoring. We will discuss other techniques in succeeding posts. Throughout this series we will go through the following:
 
-* Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells
-    *   [Server Software Component: Web Shell](https://attack.mitre.org/techniques/T1505/003/)
+* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
+    *   Server Software Component: Web Shell
 * [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](https://pberba.github.io/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
-    *   [Create Account: Local Account](https://attack.mitre.org/techniques/T1136/001/)
-    *   [Valid Accounts: Local Accounts](https://attack.mitre.org/techniques/T1078/003/)
-    *   [Account Manipulation: SSH Authorized Keys](https://attack.mitre.org/techniques/T1098/004/)
-* Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron
-    *   [Create or Modify System Process: Systemd Service](https://attack.mitre.org/techniques/T1543/002/)
-    *   [Scheduled Task/Job: Systemd Timers](https://attack.mitre.org/techniques/T1053/006/)
-    *   [Scheduled Task/Job: Cron](https://attack.mitre.org/techniques/T1053/003/)
-* Hunting for Persistence in Linux (Part 4): Initialization Scripts, Shell Configuration, and others
-    *   [Boot or Logon Initialization Scripts: RC Scripts](https://attack.mitre.org/techniques/T1037/004/)
-    *   [Event Triggered Execution: Unix Shell Configuration Modification](https://attack.mitre.org/techniques/T1546/004/)
+    *   Create Account: Local Account
+    *   Valid Accounts: Local Accounts
+    *   Account Manipulation: SSH Authorized Keys
+* (WIP) Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron 
+    *   Create or Modify System Process: Systemd Service
+    *   Scheduled Task/Job: Systemd Timers
+    *   Scheduled Task/Job: Cron
+* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts, Shell Configuration, and others
+    *   Boot or Logon Initialization Scripts: RC Scripts
+    *   Event Triggered Execution: Unix Shell Configuration Modification
+
 
 ### Introduction to persistence
 
