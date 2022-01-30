@@ -10,7 +10,7 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: How attackers use newly created and existing accounts for peristence and how to detect them.
 description: How attackers use newly created and existing accounts for peristence and how to detect them.
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: /assets/posts/20220130/0-cover.jpg
+header-img-direct: https://pberba.github.io/assets/posts/20220130/0-cover.jpg
 toc: true
 ---
 
@@ -36,7 +36,7 @@ Linux Persistence Series:
     *   Create Account: Local Account
     *   Valid Accounts: Local Accounts
     *   Account Manipulation: SSH Authorized Keys
-* Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron 
+* Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
     *   Create or Modify System Process: Systemd Service
     *   Scheduled Task/Job: Systemd Timers
     *   Scheduled Task/Job: Cron
