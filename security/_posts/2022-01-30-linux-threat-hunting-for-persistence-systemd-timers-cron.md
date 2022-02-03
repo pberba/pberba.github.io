@@ -10,11 +10,9 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: How attackers use newly created and existing accounts for peristence and how to detect them.
 description: How attackers use newly created and existing accounts for peristence and how to detect them.
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: https://pberba.github.io/assets/posts/20220130/0-cover.jpg
+header-img-direct: /assets/posts/20220130/0-cover.jpg
 toc: true
 ---
-
-
 
 
 ### Introduction
@@ -25,24 +23,38 @@ In this blogpost, we'll discuss how attackers can create services and scheduled 
 *   [Scheduled Task/Job: Systemd Timers](https://attack.mitre.org/techniques/T1053/006/)
 *   [Scheduled Task/Job: Cron](https://attack.mitre.org/techniques/T1053/003/)
 
-We will give some example commands on how to implement these persistence techinques and how to create alerts using open-source solutions such as auditd, sysmon and auditbeats. 
+We will give some example commands on how to implement these persistence techinques and how to create alerts using open-source solutions such as auditd, osquery, sysmon and auditbeats. 
 
 If you need help how to setup auditd, sysmon and/or auditbeats, you can try following the instructions in the [appendix in part 1](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#appendix). 
 
+Here is a diagram of the things we will cover in this blog post:
+![](/assets/posts/20220130/0-introduction.png)
+_Links to the full version [\[image\]](/assets/posts/common/20220201-linux-persistence.png) [\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf)_
+
 Linux Persistence Series:
-* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
+* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
     *   Server Software Component: Web Shell
-* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](https://pberba.github.io/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
+* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
     *   Create Account: Local Account
     *   Valid Accounts: Local Accounts
     *   Account Manipulation: SSH Authorized Keys
-* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
+* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
     *   Create or Modify System Process: Systemd Service
     *   Scheduled Task/Job: Systemd Timers
     *   Scheduled Task/Job: Cron
-* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts, Shell Configuration, and others
+* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts and Shell Configuration
     *   Boot or Logon Initialization Scripts: RC Scripts
+    *   Boot or Logon Initialization Scripts: init.d
+    *   Boot or Logon Initialization Scripts: motd
     *   Event Triggered Execution: Unix Shell Configuration Modification
+*  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
+    *    Boot or Logon Initialization Scripts: systemd-generators
+*  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
+    *   Modify Authentication Process: Pluggable Authentication Modules
+    *   Compromise Client Software Binary
+    *   Boot or Logon Autostart Execution: Kernel Modules and Extensions
+    *   Hijack Execution Flow: Dynamic Linker Hijacking
+
 
 
 
@@ -293,10 +305,10 @@ For this, I recommend adding the following rules
 -w /usr/lib/systemd/ -p wa -k systemd
 -w /lib/systemd/ -p wa -k systemd
 
-# -w /usr/local/lib/systemd/ -p wa -k systemd
-# -w /usr/local/share/systemd/user -p wa -k systemd_user
-# -w /usr/share/systemd/user  -p wa -k systemd_user
-# -w /usr/local/lib/systemd/user -p wa -k systemd_user
+# Directories may not exist
+-w /usr/local/lib/systemd/ -p wa -k systemd
+-w /usr/local/share/systemd/user -p wa -k systemd_user
+-w /usr/share/systemd/user  -p wa -k systemd_user
 ```
 The commented out rules may not be immediately applicable because they might not exist depending on the distro you are using. We cannot use auditd rules for directories that don't exist at the time the service is started.
 
@@ -438,7 +450,7 @@ SELECT name, source, path, status, md5
 FROM startup_items 
 JOIN hash 
 USING(path)
-WHERE path LIKE "%.service" 
+WHERE path LIKE "%.service"  AND status = "inactive"
 ORDER BY name;
 ```
 
@@ -529,6 +541,9 @@ ExecStartPre=/root/run.sh
 Similar to creation of a new service, detecting this would require a form of file integrity monitoring. So be careful with just whitelisting services when looking for malicious installations.
 
 ### 6 Scheduled Task/Job: Systemd Timers
+
+**MITRE:**  [https://attack.mitre.org/techniques/T1053/006/](https://attack.mitre.org/techniques/T1053/006/)
+
 
 #### 6.1 Understanding systemd timers 
 
@@ -645,6 +660,8 @@ WHERE id LIKE "%timer";
 
 
 ### 7 Scheduled Task/Job: Cron
+
+**MITRE:** [https://attack.mitre.org/techniques/T1053/003/](https://attack.mitre.org/techniques/T1053/003/))
 
 #### 7.1 Introduction to cron
 
@@ -777,15 +794,13 @@ WHERE
 ![](/assets/posts/20220130/7-crontab-2.png)
 
 
-
-
 ### Conclusions and What's next
 
 We've discussed how to create and detect the creation service, timers, and cronjobs. 
 
 Personally, it took a while to fully grasp `systemd` and I found that the best resources were the man pages. I hope that I've been able to provide materials to make these concepts more accessible. If there are mistakes here are things you might want to add, feel free to reach out.
 
-In the next post, we'll be finishing up on the last few examples on persistence, mainly, initialization Scripts, shell Configuration, and some other stuff we can sneak in.
+In the next post, we'll going through where to put scripts/executables that run on boot or logon using initizalization scripts and shell configurations.
 
 ----
 
@@ -807,5 +822,4 @@ In the next post, we'll be finishing up on the last few examples on persistence,
 
 \[8\] [systemd user services](https://www.unixsysadmin.com/systemd-user-services/)
 
-Photo by [Chris Barbalis](https://unsplash.com/@cbarbalis) on [Unsplash](https://unsplash.com/) 
 Photo by [Matej from Pexels](https://www.pexels.com/photo/analog-wall-clock-with-bells-800427/)

@@ -28,20 +28,35 @@ We will give some example commands on how to implement these persistence techinq
 
 If you need help how to setup auditd, sysmon and/or auditbeats, you can try following the instructions in the [appendix in part 1](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#appendix).
 
+
+Here is a diagram of the things we will cover in this blog post:
+![](/assets/posts/20211123/0-introduction.png)
+_Links to the full version [\[image\]](/assets/posts/common/20220201-linux-persistence.png) [\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf)_
+
 This is part 2 of a series on persistence in linux:
-* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
+* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
     *   Server Software Component: Web Shell
-* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](https://pberba.github.io/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
+* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
     *   Create Account: Local Account
     *   Valid Accounts: Local Accounts
     *   Account Manipulation: SSH Authorized Keys
-* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
+* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
     *   Create or Modify System Process: Systemd Service
     *   Scheduled Task/Job: Systemd Timers
     *   Scheduled Task/Job: Cron
-* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts, Shell Configuration, and others
+* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts and Shell Configuration
     *   Boot or Logon Initialization Scripts: RC Scripts
+    *   Boot or Logon Initialization Scripts: init.d
+    *   Boot or Logon Initialization Scripts: motd
     *   Event Triggered Execution: Unix Shell Configuration Modification
+*  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
+    *    Boot or Logon Initialization Scripts: systemd-generators
+*  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
+    *   Modify Authentication Process: Pluggable Authentication Modules
+    *   Compromise Client Software Binary
+    *   Boot or Logon Autostart Execution: Kernel Modules and Extensions
+    *   Hijack Execution Flow: Dynamic Linker Hijacking
+
 
 
 

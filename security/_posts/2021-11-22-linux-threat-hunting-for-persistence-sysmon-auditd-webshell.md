@@ -34,21 +34,36 @@ Each persistence technique has two main parts:
 1.  How to deploy the persistence techniques
 2.  How to monitor and detect persistence techniques
 
-In this blog post we will only discuss web shell as a case study for logging and monitoring. We will discuss other techniques in succeeding posts. Throughout this series we will go through the following:
+In this blog post we will only discuss web shell but we will be focusing more on logging and monitoring. We will discuss other techniques in succeeding posts. 
 
-* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
+Here is the current coverage of this blog post series and topics you can look forward in the next posts. 
+![](/assets/posts/common/20220201-linux-persistence.png)
+_[\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf) version_
+
+Here is the outline for the series:
+* [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
     *   Server Software Component: Web Shell
-* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](https://pberba.github.io/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
+* [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
     *   Create Account: Local Account
     *   Valid Accounts: Local Accounts
     *   Account Manipulation: SSH Authorized Keys
-* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
+* [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
     *   Create or Modify System Process: Systemd Service
     *   Scheduled Task/Job: Systemd Timers
     *   Scheduled Task/Job: Cron
-* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts, Shell Configuration, and others
+* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts and Shell Configuration
     *   Boot or Logon Initialization Scripts: RC Scripts
+    *   Boot or Logon Initialization Scripts: init.d
+    *   Boot or Logon Initialization Scripts: motd
     *   Event Triggered Execution: Unix Shell Configuration Modification
+*  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
+    *    Boot or Logon Initialization Scripts: systemd-generators
+*  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
+    *   Modify Authentication Process: Pluggable Authentication Modules
+    *   Compromise Client Software Binary
+    *   Boot or Logon Autostart Execution: Kernel Modules and Extensions
+    *   Hijack Execution Flow: Dynamic Linker Hijacking
+
 
 
 ### Introduction to persistence
@@ -642,7 +657,7 @@ If you want to add rules to `main.xml` then you can modify it and then reload th
 
 ```bash
 sudo sysmon -c main.xml  
-sudo sysmtectl restart sysmon
+sudo systemctl restart sysmon
 ```
 #### A02 Setup auditbeats and auditd for linux 
 
@@ -675,7 +690,17 @@ To configure auditd rules, validate location of the `audit_rule_files` 
 # ...
 ```
 
-In this case it is in `/etc/auditbeat/audit.rules.d/` and I add `audit-rules.conf` from [https://github.com/Neo23x0/auditd/blob/master/audit.rules](https://github.com/Neo23x0/auditd/blob/master/audit.rules)
+In this case it is in `/etc/auditbeat/audit.rules.d/` and I add `audit-rules.conf` from [https://github.com/Neo23x0/auditd/blob/master/audit.rules](https://github.com/Neo23x0/auditd/blob/master/audit.rules). When you start/restart the `auditbeat` service it may result in an error. To make this work in my debian 10 VM, I needed to delete the following rules:
+
+```
+-D
+-b 8192
+-f 1
+-i
+-a never,exit -F arch=b64 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
+-a always,exit -F arch=b32 -F uid!=ntp -S adjtimex -S settimeofday -S clock_settime -k time
+-a always,exit -F arch=b64 -F uid!=ntp -S adjtimex -S settimeofday -S clock_settime -k time
+```
 
 For some of the custom rules I make I add it in `/etc/auditbeat/audit.rules.d/custom.conf` 
 
