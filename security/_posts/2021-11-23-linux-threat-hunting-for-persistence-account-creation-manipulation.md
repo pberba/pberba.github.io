@@ -35,20 +35,20 @@ _Links to the full version [\[image\]](/assets/posts/common/20220201-linux-persi
 
 This is part 2 of a series on persistence in linux:
 * [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
-    *   Server Software Component: Web Shell
+    *   1 - Server Software Component: Web Shell
 * [Hunting for Persistence in Linux (Part 2): Account Creation and Manipulation](/security/2021/11/23/linux-threat-hunting-for-persistence-account-creation-manipulation/#introduction)
-    *   Create Account: Local Account
-    *   Valid Accounts: Local Accounts
-    *   Account Manipulation: SSH Authorized Keys
+    *   2 - Create Account: Local Account
+    *   3 - Valid Accounts: Local Accounts
+    *   4 - Account Manipulation: SSH Authorized Keys
 * [Hunting for Persistence in Linux (Part 3): Systemd, Timers, and Cron](/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/)
-    *   Create or Modify System Process: Systemd Service
-    *   Scheduled Task/Job: Systemd Timers
-    *   Scheduled Task/Job: Cron
-* (WIP) Hunting for Persistence in Linux (Part 4): Initialization Scripts and Shell Configuration
-    *   Boot or Logon Initialization Scripts: RC Scripts
-    *   Boot or Logon Initialization Scripts: init.d
-    *   Boot or Logon Initialization Scripts: motd
-    *   Event Triggered Execution: Unix Shell Configuration Modification
+    *   5 - Create or Modify System Process: Systemd Service
+    *   6 - Scheduled Task/Job: Systemd Timers
+    *   7 - Scheduled Task/Job: Cron
+* [Hunting for Persistence in Linux (Part 4): Initialization Scripts and Shell Configuration](/security/2022/02/06/linux-threat-hunting-for-persistence-initialization-scripts-and-shell-configuration/)
+    *   8 - Boot or Logon Initialization Scripts: RC Scripts
+    *   9 - Boot or Logon Initialization Scripts: init.d
+    *   10 - Boot or Logon Initialization Scripts: motd
+    *   11 - Event Triggered Execution: Unix Shell Configuration Modification
 *  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
     *    Boot or Logon Initialization Scripts: systemd-generators
 *  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
