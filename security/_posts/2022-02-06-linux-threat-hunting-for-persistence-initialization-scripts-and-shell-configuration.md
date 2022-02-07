@@ -47,13 +47,14 @@ Linux Persistence Series:
     *   9 - Boot or Logon Initialization Scripts: init.d
     *   10 - Boot or Logon Initialization Scripts: motd
     *   11 - Event Triggered Execution: Unix Shell Configuration Modification
-*  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
-    *    Boot or Logon Initialization Scripts: systemd-generators
+*  [Hunting for Persistence in Linux (Part 5): Systemd Generators](/security/2022/02/07/linux-threat-hunting-for-persistence-systemd-generators/) 
+    *   12 - Boot or Logon Initialization Scripts: systemd-generators
 *  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
     *   Modify Authentication Process: Pluggable Authentication Modules
     *   Compromise Client Software Binary
     *   Boot or Logon Autostart Execution: Kernel Modules and Extensions
     *   Hijack Execution Flow: Dynamic Linker Hijacking
+
 
 
 ### 8 Boot or Logon Initialization Scripts: RC Scripts

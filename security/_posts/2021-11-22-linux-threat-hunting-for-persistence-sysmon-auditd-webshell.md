@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery, and Webshells"
-mini_title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery, and Webshells"
+title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery (and Webshells)"
+mini_title: "Hunting for Persistence in Linux (Part 1): Auditd, Sysmon, Osquery (and Webshells)"
 date: 2021-11-22
 category: security
 comments: true
@@ -10,24 +10,18 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: An introduction to monitoring and logging in linux to look for persistence.
 description: An introduction to monitoring and logging in linux to look for persistence. With examples how to setup and detect web shell backdoors.
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: https://cdn-images-1.medium.com/max/800/1*Krk3Q13ICFXgX6WDZsttbw.jpeg
+header-img-direct: /assets/posts/common/20220201-linux-persistence.png
 toc: true
 ---
 
-This blog series explores methods attackers might use to maintain persistent access to a compromised linux system. To do this, we will take an “_offense informs defense_” approach by going through techniques listed in the [MITRE ATT&CK Matrix for Linux](https://attack.mitre.org/matrices/enterprise/linux/). I will try to:
 
+### Overview of blog series
+
+Welcome to this blog series "Hunting for Persistence in Linux"! This is a series that explores methods attackers might use to maintain persistent access to a compromised linux system. To do this, we will take an “_offense informs defense_” approach by going through techniques listed in the [MITRE ATT&CK Matrix for Linux](https://attack.mitre.org/matrices/enterprise/linux/). I will try to:
 1.  Give examples of how an attacker might deploy one of these backdoors
 2.  Show how a defender might monitor and detect these installations
 
 By giving concrete implementations of these persistence techniques, I hope to give defenders a better appreciation of what exactly they are trying to detect, and some clear examples of how they can test their own alerting.
-
-### Overview of blog series
-
-The rest of the blog post is structured with the following:
-
-1.  Introduction to persistence
-2.  Linux Auditing and File Integrity Monitoring
-3.  How to setup and detect web shells
 
 Each persistence technique has two main parts:
 
@@ -36,9 +30,7 @@ Each persistence technique has two main parts:
 
 In this blog post we will only discuss web shell but we will be focusing more on logging and monitoring. We will discuss other techniques in succeeding posts. 
 
-Here is the current coverage of this blog post series and topics you can look forward in the next posts. 
-![](/assets/posts/common/20220201-linux-persistence.png)
-_[\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf) version_
+The diagram above gives an overview of what will be discussed in this series. _[\[pdf version\]](/assets/posts/common/20220201-linux-persistence.pdf)_
 
 Here is the outline for the series:
 * [Hunting for Persistence in Linux (Part 1): Auditing, Logging and Webshells](/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/)
@@ -56,8 +48,8 @@ Here is the outline for the series:
     *   9 - Boot or Logon Initialization Scripts: init.d
     *   10 - Boot or Logon Initialization Scripts: motd
     *   11 - Event Triggered Execution: Unix Shell Configuration Modification
-*  (WIP) Hunting for Persistence in Linux (Part 5): Systemd Generators  
-    *    Boot or Logon Initialization Scripts: systemd-generators
+*  [Hunting for Persistence in Linux (Part 5): Systemd Generators](/security/2022/02/07/linux-threat-hunting-for-persistence-systemd-generators/) 
+    *   12 - Boot or Logon Initialization Scripts: systemd-generators
 *  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
     *   Modify Authentication Process: Pluggable Authentication Modules
     *   Compromise Client Software Binary

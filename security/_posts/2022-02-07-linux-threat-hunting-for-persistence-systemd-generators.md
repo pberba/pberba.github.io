@@ -23,7 +23,7 @@ The topics discussed here are the following:
 
 We will give some example commands on how to implement these persistence techinques and how to create alerts using open-source solutions such as auditd, sysmon and auditbeats. 
 
-![](/assets/posts/20220201/0-introduction.png)
+![](/assets/posts/20220207/0-introduction.png)
 _Links to the full version [\[image\]](/assets/posts/common/20220201-linux-persistence.png) [\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf)_
 
 If you need help how to setup auditd, sysmon and/or auditbeats, you can try following the instructions in the [appendix in part 1](https://pberba.github.io/security/2021/11/22/linux-threat-hunting-for-persistence-sysmon-auditd-webshell/#appendix). 
@@ -44,7 +44,7 @@ Linux Persistence Series:
     *   9 - Boot or Logon Initialization Scripts: init.d
     *   10 - Boot or Logon Initialization Scripts: motd
     *   11 - Event Triggered Execution: Unix Shell Configuration Modification
-*  Hunting for Persistence in Linux (Part 5): Systemd Generators  
+*  [Hunting for Persistence in Linux (Part 5): Systemd Generators](/security/2022/02/07/linux-threat-hunting-for-persistence-systemd-generators/) 
     *   12 - Boot or Logon Initialization Scripts: systemd-generators
 *  (WIP) Hunting for Persistence in Linux (Part 6): Rootkits, Compromised Software, and Others
     *   Modify Authentication Process: Pluggable Authentication Modules
@@ -89,7 +89,7 @@ But there are constraints on this. The man page gives this note:
 
 We assume that some script `/opt/beacon.sh` already exists. You can replace `ExecStart` with a different path or even add the reverse shell directly.
 
-We drop a simple executable script in `/lib/systemd/system-generators/systemd-network-generator` . When run, it will:
+We drop a simple executable script in `/lib/systemd/system-generators/systemd-network-generator` . When it runs, it will:
 - Create a `/run/systemd/system/networking.service` unit file
 - Create a symlink to `/run/systemd/system/multi-user.target.wants/networking.service` to enable the service
 - Create a `sysmon.service` and `auditbeat.service` that will overwrite the configuration of the original services.
@@ -114,6 +114,9 @@ EOF
 chmod +x /lib/systemd/system-generators/systemd-network-generator
 ```
 
+You might wonder: _"Why do we need to make a service unit file? Why don't we run the `/opt/beacon.sh` in the background directly?"_ 
+
+Well, this is the general way that systemd generators run. For example, network functionality won't be ready when the generators are executed. So it is simpler to have generate service file instead and set `network.target` as a dependency. In theory, you might need to include special logic in your executable to either wait or retry until network. 
 
 The generated service file is very simple. If you want more info about this read the [previous blogpost - 5.2.2 Minimal service file
 ](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/#52-installing-a-malicious-service)
@@ -146,7 +149,6 @@ $ systemctl status networking
 
 Of course you can modify the value of `ExecStart` or the contents of `/opt/beacon.sh` to whatever script you want.
 
-
 Also because we have written new `sysmon.service` and `auditbeat.service` in `/run/systemd/generator.early/` and this takes precendence over `/etc/systemd/system` and `/lib/systemd/system` (See order in `systemd-analyze unit-paths`). The `sysmon` and `auditbeat` did not run the correct daemons.
 
 ```bash
@@ -161,10 +163,7 @@ Feb 02 07:15:30 host systemd[1]: Started "Skipped".
 Feb 02 07:15:30 host echo[377]: Skipped
 Feb 02 07:15:30 host systemd[1]: auditbeat.service: Succeeded.
 
-
-$ systemctl status sytsmon
-Unit sytsmon.service could not be found.
-user@persistence-blog:~$ systemctl status sysmon
+$ systemctl status sysmon
 ● sysmon.service - "Skipped"
    Loaded: loaded (/run/systemd/generator.early/sysmon.service; generated)
    Active: inactive (dead) since Wed 2022-02-02 07:15:30 UTC; 26s ago
