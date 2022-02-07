@@ -21,7 +21,7 @@ In this blogpost, we're discussing a specific persistence technique that I haven
 The topics discussed here are the following:
 *   [Boot or Logon Initialization Scripts: systemd-generators](https://attack.mitre.org/techniques/T1037/)
 
-We will give some example commands on how to implement these persistence techinques and how to create alerts using open-source solutions such as auditd, sysmon and auditbeats. 
+We will give some example commands on how to implement these persistence techniques and how to create alerts using open-source solutions such as auditd, sysmon and auditbeats. 
 
 ![](/assets/posts/20220207/0-introduction.png)
 _Links to the full version [\[image\]](/assets/posts/common/20220201-linux-persistence.png) [\[pdf\]](/assets/posts/common/20220201-linux-persistence.pdf)_
@@ -74,7 +74,7 @@ The directories can be found in the man page but here are some persistent ones:
 - `/usr/local/lib/systemd/user-generators/*`
 - `/usr/lib/systemd/user-generators/*`
 
-One use case for this is backwards compatibility. For example, `systemd-rc-local-generator` and `systemd-sysv-generator` are both used to process `rc.local` and `init.d` scripts respectively. These executables that convert the traditional startup scripts into `systemd` services by parsing them and creating wrapper `service` unit files on boot. It is a preprocessing step for `systemd` before it runs any services.
+One use case for this is backwards compatibility. For example, `systemd-rc-local-generator` and `systemd-sysv-generator` are both used to process `rc.local` and `init.d` scripts respectively. These executables convert the traditional startup scripts into `systemd` services by parsing them and creating wrapper `service` unit files on boot. It is a preprocessing step for `systemd` before it runs any services.
 
 Other modules can also drop their own executable in one the listed locations and this will also be executed on boot or anytime the systemd configuration is reloaded. For example, installing `openvpn` results in a `/usr/lib/systemd/system-generators/openvpn-generator`  
 
@@ -120,7 +120,7 @@ chmod +x /lib/systemd/system-generators/systemd-network-generator
 
 You might wonder: _"Why do we need to make a service unit file? Why don't we run the `/opt/beacon.sh` in the background directly?"_ 
 
-Well, this is the recommended way that systemd generators operate. For example, network functionality might not be ready when the generators are executed. So it is simpler to have generate service file instead and set `network.target` as a dependency. However, it is possible to create a long running background process on boot; it either waits or retries until the necessary OS functionality becomes available. 
+Well, this is the recommended way that systemd generators operate. For example, network functionality might not be ready when the generators are executed. So it is simpler to generate service file instead and set `network.target` as a dependency. However, it is possible to create a long running background process on boot; it either waits or retries until the necessary OS functionality becomes available. 
 
 The generated service file is very simple. If you want more info about this read the [previous blogpost - 5.2.2 Minimal service file
 ](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/#52-installing-a-malicious-service)
@@ -153,7 +153,7 @@ $ systemctl status networking
 
 Of course you can modify the value of `ExecStart` or the contents of `/opt/beacon.sh` to whatever script you want.
 
-Also because we have written new `sysmon.service` and `auditbeat.service` in `/run/systemd/generator.early/` and this takes precendence over `/etc/systemd/system` and `/lib/systemd/system` (See order in `systemd-analyze unit-paths`). The `sysmon` and `auditbeat` did not run the correct daemons.
+Also because we have written new `sysmon.service` and `auditbeat.service` in `/run/systemd/generator.early/` and this takes precedence over `/etc/systemd/system` and `/lib/systemd/system` (See order in `systemd-analyze unit-paths`). The `sysmon` and `auditbeat` did not run the correct daemons.
 
 ```bash
 $ systemctl status auditbeat
