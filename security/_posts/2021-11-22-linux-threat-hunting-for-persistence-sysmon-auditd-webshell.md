@@ -10,7 +10,7 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: An introduction to monitoring and logging in linux to look for persistence.
 description: An introduction to monitoring and logging in linux to look for persistence. With examples how to setup and detect web shell backdoors.
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: /assets/posts/common/20220201-linux-persistence.png
+header-img-direct: https://pberba.github.io/assets/posts/common/20220201-linux-persistence.png
 toc: true
 ---
 

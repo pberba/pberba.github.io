@@ -10,7 +10,7 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: How attackers create can maintain persistence by inserting scripts and executables in special locations that will run on boot or logon
 description: How attackers create can maintain persistence by inserting scripts and executables in special locations that will run on boot or logon
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: /assets/posts/20220206/0-header.jpg
+header-img-direct: https://pberba.github.io/assets/posts/20220206/0-header.jpg
 toc: true
 ---
 

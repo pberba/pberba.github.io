@@ -10,7 +10,7 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: How attackers use newly created and existing accounts for peristence and how to detect them.
 description: How attackers use newly created and existing accounts for peristence and how to detect them.
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: /assets/posts/20220130/0-cover.jpg
+header-img-direct: https://pberba.github.io/assets/posts/20220130/0-cover.jpg
 toc: true
 ---
 
