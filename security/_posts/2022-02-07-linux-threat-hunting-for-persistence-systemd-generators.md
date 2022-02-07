@@ -10,13 +10,13 @@ sub_categories: [mitre, persistence, threat hunting, sysmon, auditd]
 summary: How attackers can insert backdoors early in the boot process using systemd generators
 description: How attackers can insert backdoors early in the boot process using systemd generators
 tags: [mitre, persistence, threat hunting, sysmon, auditd]
-header-img-direct: /assets/posts/20220207/0-header.jpg
+header-img-direct: https://pberba.github.io/assets/posts/20220207/0-header.jpg
 toc: true
 ---
 
 ### Introduction
 
-In this blogpost, we're discussing a specific persistence technique that I haven't ready anywhere else. Because of this, it seemed appropriate for it to have its own post.
+In this blogpost, we're discussing a specific persistence technique that I haven't read anywhere else. Because of this, it seemed appropriate for it to have its own post.
 
 The topics discussed here are the following:
 *   [Boot or Logon Initialization Scripts: systemd-generators](https://attack.mitre.org/techniques/T1037/)
