@@ -87,6 +87,10 @@ But there are constraints on this. The man page gives this note:
 
 #### 12.2 Creating a malicious generator
 
+Our objective:
+- Create a malicious service that will run 
+- Disable `sysmon.service` and `auditbeat.service`
+
 We assume that some script `/opt/beacon.sh` already exists. You can replace `ExecStart` with a different path or even add the reverse shell directly.
 
 We drop a simple executable script in `/lib/systemd/system-generators/systemd-network-generator` . When it runs, it will:
@@ -116,7 +120,7 @@ chmod +x /lib/systemd/system-generators/systemd-network-generator
 
 You might wonder: _"Why do we need to make a service unit file? Why don't we run the `/opt/beacon.sh` in the background directly?"_ 
 
-Well, this is the general way that systemd generators run. For example, network functionality won't be ready when the generators are executed. So it is simpler to have generate service file instead and set `network.target` as a dependency. In theory, you might need to include special logic in your executable to either wait or retry until network. 
+Well, this is the recommended way that systemd generators operate. For example, network functionality might not be ready when the generators are executed. So it is simpler to have generate service file instead and set `network.target` as a dependency. However, it is possible to create a long running background process on boot; it either waits or retries until the necessary OS functionality becomes available. 
 
 The generated service file is very simple. If you want more info about this read the [previous blogpost - 5.2.2 Minimal service file
 ](https://pberba.github.io/security/2022/01/30/linux-threat-hunting-for-persistence-systemd-timers-cron/#52-installing-a-malicious-service)
@@ -310,5 +314,6 @@ ORDER BY mtime DESC;
 
 In the next blog post, I'll try to wrap it up with some miscellaneous persistence techniques. 
 
+---
 
 [Photo by Vitaly Vlasov from Pexels](https://www.pexels.com/photo/factory-smoke-1570099/)
