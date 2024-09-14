@@ -4,20 +4,14 @@ permalink: /about
 title: About me
 ---
 
-Hi, I'm Pepe Berba GMON, CCSK. 
-
-I write about stats, security, and cryptography. I've been bouncing back and forth between cybersecurity and machine learning for the past few years. In my free-time, I practice penetration testing and forensics, and I'm targetting to get an OSCP in the future.
-
-I'm a hobbyist cryptographer. I've had a few units of cryptography and number theory in college and some experience solving crypto challenges in CTFs. Nothing serious.
-
+Hi, I'm Pepe Berba. 
 
 Background 
 ----------
 
-I'm currently a Cloud Security Engineer and an ex-Machine Learning Researcher at [Thinking Machines Data
-Science](https://thinkingmachin.es/), a data science startup in the Philippines. I'm also trying to finish my masters degree in data science from the University of the Philippines, School of Statistics.
+I'm currently working in Threat Detection and Hunting at Canva. 
 
-Previously, I worked in a Redrock IT Security, a cybersecurity startup based in the Philippines. I was part of the founding team of the SOC and had to wear many hats: deploying SIEMs from scratch using ELK, developing integrations and custom scripts for the operations, configuring rules and alerts for threat detection, and monitoring and analyzing alerts.
+Previously, I've worked a Machine Learning Researcher at Thinking Machines, a data science constultancy in the Philippines, and worked as an SOC Engineering in a MSSP, Red Rock Security.
 
 
 Certifications 
