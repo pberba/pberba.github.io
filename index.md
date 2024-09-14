@@ -14,11 +14,11 @@ layout: home
             <b> Pepe Berba</b>. I blog about stats, security, and crypto. 
         </p>
         <p>
-            I'm a Cloud Security Engineer at <a
-            href="https://thinkingmachin.es/">Thinking Machines</a> while taking up my masters degree in data science.
+            I'm in Threat Hunting and Detection at <a
+            href="https://canva.com/">Canva</a>
         </p>
         <p>
-            Ex-Machine Learning Researcher also at Thinking Machines and previously a SOC Engineer at Redrock IT Security.
+            Ex-Machine Learning Researcher at Thinking Machines and previously a SOC Engineer at Redrock IT Security.
         </p>
     </div>
 </div>
