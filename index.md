@@ -14,7 +14,7 @@ layout: home
             <b> Pepe Berba</b>. I blog about stats, security, and crypto. 
         </p>
         <p>
-            I'm in Threat Hunting and Detection at <a
+            I'm in Threat Detection and Hunting at <a
             href="https://canva.com/">Canva</a>
         </p>
         <p>

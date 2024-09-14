@@ -489,7 +489,8 @@ you-rabbit[.]com
 ### Resources that reference some of these IOCs
 - [https://www.trendmicro.com/en_au/research/23/k/attack-signals-possible-return-of-genesis-market.html](https://www.trendmicro.com/en_au/research/23/k/attack-signals-possible-return-of-genesis-market.html)
 - [https://www.zscaler.com/blogs/security-research/black-hat-seo-leveraged-distribute-malware](https://www.zscaler.com/blogs/security-research/black-hat-seo-leveraged-distribute-malware)
-- [https://www.akat-t.com/wp-content/uploads/2024_05_01_Threat_Alert_Malicious_Extension_Targets_Chromium_Based_Web_Browsers_Steals_Data.pdf](https://www.akat-t.com/wp-content/uploads/2024_05_01_Threat_Alert_Malicious_Extension_Targets_Chromium_Based_Web_Browsers_Steals_Data.pdf)
+- [Symantec: Malicious Extension Targets Chromium-Based Web Browsers, Steals
+Data](https://www.akat-t.com/wp-content/uploads/2024_05_01_Threat_Alert_Malicious_Extension_Targets_Chromium_Based_Web_Browsers_Steals_Data.pdf)
 - [https://tria.ge/240618-p92adavbmf](https://tria.ge/240618-p92adavbmf)
 - [https://any.run/malware-trends/lu0bot](https://any.run/malware-trends/lu0bot)
 - [https://sector7.computest.nl/post/2023-04-technical-analysis-genesis-market/](https://sector7.computest.nl/post/2023-04-technical-analysis-genesis-market/)
