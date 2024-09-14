@@ -8,8 +8,8 @@ comments: true
 toc: true
 author: "Pepe Berba"
 sub_categories: [crypto, xor, genesis market, rilide, malware, urlscan, cursedchrome]
-summary: Cracking the simple encryption scheme used by Genesis Market to hunt for of the malicious browser extension
-description: Cracking the simple encryption scheme used by Genesis Market to hunt for samples of the malicious browser extension
+summary: Cracking the simple encryption scheme used by Genesis Market to hunt for malicious browser extensions
+description: Cracking the simple encryption scheme used by Genesis Market to hunt for malicious browser extensions
 header-img-direct: https://pberba.github.io/assets/posts/20240914/header.jpg
 
 ---
