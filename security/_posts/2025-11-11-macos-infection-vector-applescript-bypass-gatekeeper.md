@@ -117,7 +117,7 @@ As noted by other researchers, several of these `.scpt` files still have zero de
 `.scpt` files naturally lends itself back into the DMG flow that we've seen in the last few years. The only example I've found so far is `远程安装/双击打开我.scpt`, which Google translates to `Remote installation/double-click to open my.scpt`
 
 ![](/assets/posts/20251111/bad_dmg_itw.png)
-*[31cd55a2f96f6d760653c28699c18589cf2e7d39a0f257579f587f3dce03a6c6](https://www.virustotal.com/gui/file/31cd55a2f96f6d760653c28699c18589cf2e7d39a0f257579f587f3dce03a6c6)*
+*[31cd....a6c6](https://www.virustotal.com/gui/file/31cd55a2f96f6d760653c28699c18589cf2e7d39a0f257579f587f3dce03a6c6)*
 
 The format of the prompt here is slightly different from what we've seen.
 ![](/assets/posts/20251111/bad_dmg_scpt.png)
@@ -134,7 +134,7 @@ On macOS, each file type has a default icon. Normally, this icon is determined b
 This is stored in the file's `resource fork`, which can be preserved, depending on how the file is delivered. For example, if a file is delivered through a `zip`, then you can see the resource fork in the bundled items of the zip file.
 
 ![](/assets/posts/20251111/fake_doc_vt.png)
-*[99cfb160a2453a22cc025fe0afc21d660744205eff2885836d8e543fda50f06d](https://www.virustotal.com/gui/file/99cfb160a2453a22cc025fe0afc21d660744205eff2885836d8e543fda50f06d/)*
+*[99cf...f06d](https://www.virustotal.com/gui/file/99cfb160a2453a22cc025fe0afc21d660744205eff2885836d8e543fda50f06d/)*
 
 When this is unzipped on a Mac endpoint, the custom icon will be displayed, resulting in a convincing fake document. In the sample below, we see that the attacker has provided fake docs for both macOS and Windows.
 
