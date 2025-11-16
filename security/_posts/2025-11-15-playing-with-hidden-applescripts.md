@@ -47,16 +47,15 @@ The commands above we do the following:
 
 We can see the the hidden AppleScript in `good.scpt/..namedfork/rsrc`, and this is what is executed.
 
-
 ![](/assets/posts/20251115/01-xxd.png)
 
 The usage of named forks is not new. S1 has previously analyzed [a sample hides a second payload in the named fork.](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/)   A notable difference between this technique versus the one described by SentinelOne, is that the payload doesn't need to be extracted from the resource fork. `osascript` will automatically detect the hidden payload and execute it. 
 
 There isn't a lot of documentation on this. Based on [AppleScript Definitive Guide - Compiled Script File Formats](https://litux.nl/mirror/applescriptdefinitiveguide/applescpttdg2-CHP-3-SECT-5.html#applescpttdg2-CHP-3-SECT-5.1)  the use of resource forks is a legacy feature that has been deprecated but supported for backwards compatibility. At the time of writing, our testing finds that the compiled applescript always takes priority over the original file. 
 
-Based on this, we will go through some examples of how this can be abused
+With this, we will go through some observations that we've had while playing around this this.
 
-#### Example 1: Difference between read vs Run 
+#### Example 1: Difference between read vs run 
 
 Similar to the example in the introduction, if the data in the file is another AppleScript (plaintext or compiled), this is ignored.
 
@@ -103,16 +102,20 @@ And in this example, the resource forks were not scanned (well they didn't have 
 
 #### Other notes
 
-On top of what was suggested in the [previous blog](https://0x626c6f67.xyz/posts/hiding-compiled-applescripts/#detection). This just goes back to monitoring `osascript` and `Script Editor` behavior.
+Unlike in [S1's sample](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/), malware that would use this technique don't need to reference the `<file>/..namedfork/rsrc` directly since it's all done implicitly. It isn't rare for compiled AppleScripts to have a resource fork; If you create an compiled AppleScript with `Script Editor` it will have a  resource fork.
 
+I don't know how common it is to find compiled applescript in resource forks, but existing tools like `yara` and maybe even EDR tools might not scan the extended attributes. 
 
-Existing tools like `yara` won't scan the extended attributes. You can try to scan resource fork directly  
+You can try to scan resource fork directly  
 ```
 yara rule.yar <file>/..namedfork/rsrc
 ```
+
+On top of what was suggested in the [previous blog](https://0x626c6f67.xyz/posts/hiding-compiled-applescripts/#detection). This just goes back to monitoring `osascript` and `Script Editor` behavior.
+
  
 If you are analyzing a zip, use a tool that doesn't set the extended attributes, like `unzip`.
 
 ![](/assets/posts/20251115/08-unzip.png)
 
-Since the extended attributes are extracted as files, then they can be scanned like regular files. Note that the format of `<file>/..namedfork/rsrc` is different to `__MACOSX/._<file>.scpt`.
+Since the extended attributes are extracted as files, then they can be scanned like regular files. Note that the format of `<file>/..namedfork/rsrc` is different to `__MACOSX/._<file>.scpt`

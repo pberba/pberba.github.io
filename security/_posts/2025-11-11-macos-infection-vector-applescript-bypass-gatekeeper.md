@@ -143,6 +143,18 @@ When this is unzipped on a Mac endpoint, the custom icon will be displayed, resu
 
 This applies to all files on mac. `.command`, `.js`, `.txt` and even those without extensions.
 
+#### File Extensions
+
+Similar to the file icon, there is a per file setting for the visibility of file extensions that is stored in the extended attributes. Below, we demo what the `.pptx.scpt` sample would look like with this setting enabled.
+
+![](/assets/posts/20251111/extension_setting.png)
+
+Note that the `.pptx.scpt` will not work right away. You'd have to use some tricks with characters/unicode to get the `.scpt` to be hidden while still showing `.pptx`
+
+![](/assets/posts/20251111/extension_demo.png)
+
+
+
 #### More malicious DMGs 
 
 Similar to `zip` files, `dmg` files also preserve the icons of the files. This is something that has become common samples we've seen for "Drag and drop to the terminal DMGs".  Although we don't see many DMG samples that include `.scpt`, it wouldn’t be surprising to see this technique grow in adoption.
@@ -198,6 +210,13 @@ Similar to recommendations on how we can mitigate `.js`, `.vbs`, and other dange
 
 But because compiled applescripts are not text, `TextEdit` will not display it properly. 
 
+
+#### Set extensions to always show
+
+It was pointed out to me that by[sysop_host](https://0x626c6f67.xyz/posts/hiding-compiled-applescripts/#hidden-extensions) that the per-file setting for hiding extensions is overriden by Finder's settings.
+
+
+![](/assets/posts/20251111/finder_settings.png)
 
 #### Detections
 
