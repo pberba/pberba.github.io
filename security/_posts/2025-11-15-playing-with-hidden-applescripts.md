@@ -37,19 +37,19 @@ xxd good.scpt
 osascript good.scpt                            
 ```
 
-The commands above we do the following:
+The commands above do the following:
 1. Create two scripts `bad.scpt` and `good.scpt`
-2. We compile `bad.scpt` and set the output to the resource fork of `good.scpt`
-3. We inspect the contents of `good.scpt` and see that both the data and the hash are unchanged 
-4.  However, when we try to execute `osascript good.scpt`, the hidden payload is what is executed.
+2. Compile `bad.scpt` into the resource fork of `good.scpt`
+3. Inpsect the contents of `good.scpt` and see that both the data and the hash are unchanged 
+4. If you execute `osascript good.scpt`, the hidden payload is what is executed.
 
 ![](/assets/posts/20251115/00-demo.png)
 
-We can see the the hidden AppleScript in `good.scpt/..namedfork/rsrc`, and this is what is executed.
+We can see the the hidden AppleScript in `good.scpt/..namedfork/rsrc`
 
 ![](/assets/posts/20251115/01-xxd.png)
 
-The usage of named forks is not new. S1 has previously analyzed [a sample hides a second payload in the named fork.](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/). Another similar example is [RustyAttr](https://www.group-ib.com/blog/stealthy-attributes-of-apt-lazarus/), where scripts were stored in the extended attributes.  A notable difference between these previous examples and this techinque, is that the payload doesn't need to be extracted from the resource fork or extended attribute. It looks like `osascript` will automatically detect the hidden payload and execute it. 
+The usage of named forks is not new. S1 has previously analyzed [a sample hides a second payload in the named fork.](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/). Another similar example is [RustyAttr](https://www.group-ib.com/blog/stealthy-attributes-of-apt-lazarus/), where scripts were stored in the extended attributes.  A notable difference between previous examples and this techinque, is that the payload doesn't need to be extracted from the resource fork or extended attribute. It looks like `osascript` will automatically detect the hidden payload and execute it. 
 
 There isn't a lot of documentation on this. Based on [AppleScript Definitive Guide - Compiled Script File Formats](https://litux.nl/mirror/applescriptdefinitiveguide/applescpttdg2-CHP-3-SECT-5.html#applescpttdg2-CHP-3-SECT-5.1)  the use of resource forks is a legacy feature that has been deprecated but supported for backwards compatibility. At the time of writing, our testing finds that the compiled applescript always takes priority over the original file. 
 
@@ -61,7 +61,7 @@ Similar to the example in the introduction, if the data in the file is another A
 
 ![](/assets/posts/20251115/02-read-vs-run.png)
 
-This can be an interesting gotcha since an analyst can find themselves analyzing a data in the AppleScript, not knowing the the real payload is in the resource fork. For example, if an user tries to upload the `update_plain.scpt` through the VirusTotal over the web UI, only the data fork will be be analyzed.
+This can be an interesting gotcha since an analyst can find themselves analyzing some file, not knowing the the real payload is hiding in the resource fork. Moreover, if the analyst tries to upload the `update_plain.scpt` through the VirusTotal over the web UI, only the data fork will be be analyzed and the hidden payload is stripped in the process.
 
 #### Example 2: Difference between read vs compile
 
@@ -91,8 +91,7 @@ This is just an extension of `case 1`. Applescripts can load/run other applescri
 
 ![](/assets/posts/20251115/05-load-script.png)
 
-`run script` is used by this sample [31cd....a6c6](https://www.virustotal.com/gui/file/31cd55a2f96f6d760653c28699c18589cf2e7d39a0f257579f587f3dce03a6c6). And if this DMG used this method, the analysis could have missed this since most analysis would have scanned the data of the files
-
+`run script` is used by this sample [31cd....a6c6](https://www.virustotal.com/gui/file/31cd55a2f96f6d760653c28699c18589cf2e7d39a0f257579f587f3dce03a6c6). And if this DMG used this method, the analysis could have missed this since most analysis would have scanned the only data of the files
 
 ![](/assets/posts/20251115/06-bad-dmg-scpt.png)
 
@@ -102,10 +101,9 @@ And in this example, the resource forks were not scanned (well they didn't have 
 
 #### Other notes
 
-Unlike in [S1's sample](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/) and [RustyAttr](https://www.group-ib.com/blog/stealthy-attributes-of-apt-lazarus/), malware that would use this technique don't need to reference the `<file>/..namedfork/rsrc` directly since it's all done implicitly. However, it probably not rare for compiled AppleScripts to have a resource fork because  just creating an compiled AppleScript with `Script Editor` it will have a resource fork. What is probably rare is compiled AppleScripts in resource scripts, but because it's not common for these to be scanned, it'll be hard to hunt for samples.
+Unlike in [S1's sample](https://www.sentinelone.com/labs/resourceful-macos-malware-hides-in-named-fork/) and [RustyAttr](https://www.group-ib.com/blog/stealthy-attributes-of-apt-lazarus/), malware that would use this technique don't need to reference the `<file>/..namedfork/rsrc` directly since it's all done implicitly. However, it's not rare for compiled AppleScripts to have a resource forks. For example if a compiled AppleScript is created with `Script Editor` , it will have a resource fork. What is probably rare is compiled AppleScripts in resource scripts, but because it's not common for these to be scanned, it's hard for me to really say.
 
 You can scan files with resource forks by
-
 ```
 xattr -r <dir> | grep ResourceFork
 ```
@@ -121,6 +119,8 @@ If you are analyzing a zip, use a tool that doesn't set the extended attributes,
 Since the extended attributes are extracted as files, then they can be scanned like regular files. Note that the format of `<file>/..namedfork/rsrc` is different to `__MACOSX/._<file>.scpt` if its in a zipped file and `<file>:rsrc` if its in a DMG. 
 
 ![](/assets/posts/20251115/09-example-rsrc.png)
+
+Be careful how you collect your artefacts. Some CLI tools like `zip` may strip extended attributes from the files while processing the files.
 
 On top of what was suggested in the [previous blog](https://0x626c6f67.xyz/posts/hiding-compiled-applescripts/#detection), I think, this just goes back to monitoring `osascript` and `Script Editor` behavior, and if in the future I encounter a sample where I the behaviour doesn't match the what in the file, I'll take a peak and see if there's anything hinding in extended attributes or the resource fork.
 
