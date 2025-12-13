@@ -252,3 +252,40 @@
      border: 1px solid $grey-color-light;
    }
  }
+
+
+img.zoomable {
+  cursor: zoom-in;
+}
+
+/* Fullscreen overlay for zoomed image */
+.image-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.image-zoom-overlay.is-active {
+  display: flex;
+}
+
+.image-zoom-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.image-zoom-caption {
+  margin-top: 10px;
+  text-align: center;
+  color: white;
+  font-size: 14px;
+}
+
+body.zoom-open {
+  overflow: hidden;
+}

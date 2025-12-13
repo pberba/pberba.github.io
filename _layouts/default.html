@@ -2,8 +2,64 @@
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
 
   {% include head.html %}
-
   <body>
+
+    <div class="image-zoom-overlay" id="image-zoom-overlay">
+      <div>
+        <img id="image-zoom-overlay-img" src="" alt="">
+        <div class="image-zoom-caption" id="image-zoom-caption"></div>
+      </div>
+    </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var overlay    = document.getElementById('image-zoom-overlay');
+    var overlayImg = document.getElementById('image-zoom-overlay-img');
+    var overlayCap = document.getElementById('image-zoom-caption');
+
+    if (!overlay || !overlayImg || !overlayCap) return;
+
+    // Only inside post content (optional but cleaner)
+    document.querySelectorAll('.post-content img + em').forEach(function (caption) {
+      var img = caption.previousElementSibling;
+      if (!img) return;
+
+      // Mark as zoomable
+      img.classList.add('zoomable');
+
+      // Click image to open zoom
+      img.addEventListener('click', function () {
+        overlayImg.src = img.src;
+        overlayImg.alt = img.alt || '';
+        overlayCap.textContent = caption.textContent || '';
+        overlay.classList.add('is-active');
+        document.body.classList.add('zoom-open');
+      });
+
+      // Caption also zooms
+      caption.style.cursor = 'zoom-in';
+      caption.addEventListener('click', function () {
+        img.click();
+      });
+    });
+
+    // Close overlay when clicking background or image
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay || e.target === overlayImg) {
+        overlay.classList.remove('is-active');
+        document.body.classList.remove('zoom-open');
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        overlay.classList.remove('is-active');
+        document.body.classList.remove('zoom-open');
+      }
+    });
+  });
+</script>
+
 
     {% include header.html %}
 
