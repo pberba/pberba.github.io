@@ -18,8 +18,8 @@ toc: true
 
 The [applescript-decompiler](https://github.com/pberba/applescript-decompiler) is a feature-rich decompiler of run-only AppleScripts. 
 
-In this blog:
-- We validate the tool against XCSSET samples with known source
+In this blog, we have the following sections:
+- Validate the tool against XCSSET samples with known source
 - Explore anti-analysis and anti-sandbox behavior in older malware
 - Show common obfuscation tricks used in the wild
 - Walk through key internals that make the decompiler work
@@ -59,9 +59,9 @@ This blog aims to begin closing that gap. I am introducing the [applescript-deco
 If you believe me when I say that the decompiler is accurate, then you can skip this section. Otherwise, I’ll aim to show the decompiler’s accuracy by comparing the recovered scripts with their known source code.
 
 
-Our main reference here is [TrendMicro's report on the XCSSET Malware back in 2020](https://documents.trendmicro.com/assets/pdf/XCSSET_Technical_Brief.pdf). There are also other blog posts on this since, but they are lighter on details. The samples we’ll use here match those from the [2022 SentinelOne post](https://www.sentinelone.com/blog/xcsset-malware-update-macos-threat-actors-prepare-for-life-without-python/) and the [2025 Microsoft post](https://www.microsoft.com/en-us/security/blog/2025/09/25/xcsset-evolves-again-analyzing-the-latest-updates-to-xcssets-inventory/). 
+Our main reference here is [TrendMicro's report on the XCSSET Malware back in 2020](https://documents.trendmicro.com/assets/pdf/XCSSET_Technical_Brief.pdf). There have also been other blog posts on this, but they are lighter on details. The samples we’ll use here match those from the [2022 SentinelOne post](https://www.sentinelone.com/blog/xcsset-malware-update-macos-threat-actors-prepare-for-life-without-python/) and the [2025 Microsoft post](https://www.microsoft.com/en-us/security/blog/2025/09/25/xcsset-evolves-again-analyzing-the-latest-updates-to-xcssets-inventory/). 
 
-The reference source code were obtained by directly from the C2 server or captured them on the wire. This will help us validate the quality of the decompiler.
+The reference source code was obtained directly from the C2 server or captured on the wire. This will help us validate the quality of the decompiler.
 
 
 | Name | Sample | Year |
@@ -102,7 +102,7 @@ on run
 end run
 ```
 
-Doing the same for the [ukkc](https://www.virustotal.com/gui/file/18351d6df1ae9c4f9b48835266981ce614f7b6ce7b41d5178d3af8974679b1c7) also gives as a result. However, the strings are obfuscated:
+Doing the same for the [ukkc](https://www.virustotal.com/gui/file/18351d6df1ae9c4f9b48835266981ce614f7b6ce7b41d5178d3af8974679b1c7) also gives a result. However, the strings are obfuscated:
 
 ```applescript
 -- g=$(echo $w | cut -c1-32 );echo $w | cut -c33- | base64 --decode | openssl enc -d -aes-256-cbc -iv $g -K 27860c1670a8d2f3de7bbc74cd754121
@@ -128,7 +128,7 @@ g=$(echo $w | cut -c1-32 );echo $w | cut -c33- | base64 --decode | openssl enc -
 The key `27860c1670a8d2f3de7bbc74cd754121` also appears in [Microsoft's write-up](https://www.microsoft.com/en-us/security/blog/2025/09/25/xcsset-evolves-again-analyzing-the-latest-updates-to-xcssets-inventory/#:~:text=27860c1670a8d2f3de7bbc74cd754121)
 
 
-#### main boostrap module
+#### main bootstrap module
 
 We look at the main `a` payload from [d5fb...a2df](https://www.virustotal.com/gui/file/d5fb4f6a77305f8ce5c9a214c4d66448ae2bd087f9eb32e8bd30585adecca2df/details) and compare this with snippets shown by [TrendMicro back in 2020](https://documents.trendmicro.com/assets/pdf/XCSSET_Technical_Brief.pdf). There is strong overlap between the 2020 source and the 2022 decompiled version.
 
@@ -139,7 +139,7 @@ We look at the main `a` payload from [d5fb...a2df](https://www.virustotal.com/gu
 *And we can see that it still has the browser-related code.*
 
 ![](/assets/posts/20251214/02-comparison.jpg)
-*And the code snippets for loading have the same structure but have been updated for newer versions of macOS..*
+*And the code snippets for loading have the same structure but have been updated for newer versions of macOS.*
 
 #### listing module
 
@@ -164,7 +164,7 @@ Microsoft in early 2025 [[4]](https://www.microsoft.com/en-us/security/blog/2025
 
 #### xmyyeqjx
 
-For `xmyyeqjx.scpt`, we no longer have the source of the AppleScript. If we the [applescript-disassembler](https://github.com/Jinmo/applescript-disassembler), some code segments are not properly disassembled.
+For `xmyyeqjx.scpt`, we no longer have the source of the AppleScript. If we use the [applescript-disassembler](https://github.com/Jinmo/applescript-disassembler), some code segments are not properly disassembled.
 
 ![](/assets/posts/20251214/05-maybe-binding.png)
 *maybe binding?*
@@ -177,27 +177,27 @@ applescript_decompile xmyyeqjx.scpt -f
 ![](/assets/posts/20251214/06-xmyyeqjx-decompiled.png)
 *decompiled xmyyeqjx.scpt*
 
-The decompiled code matches with the behaviour described in [Microsoft's recent post on this.](https://www.microsoft.com/en-us/security/blog/2025/09/25/xcsset-evolves-again-analyzing-the-latest-updates-to-xcssets-inventory/#:~:text=The%20downloaded%20script,created%20plist%20file%3A
+The decompiled code matches with the behavior described in [Microsoft's recent post on this.](https://www.microsoft.com/en-us/security/blog/2025/09/25/xcsset-evolves-again-analyzing-the-latest-updates-to-xcssets-inventory/#:~:text=The%20downloaded%20script,created%20plist%20file%3A
 )
 
 > The downloaded script first gets the device’s serial number and the current username by executing shell commands. It then forms path to the LaunchDaemon plist file and constructs its content. It uses the echo command to paste this constructed content to the LaunchDaemon file. The file name is the name that was passed in the argument.
 
 ### Demo: OSAMiner
 
-Now that we’ve validated the tool against XCSSET, let’s try it on something where the original source is unknown. We'll try the tool with [OSAMiner samples](e-dead-adventures-in-reversing-malicious-run-only-applescripts/), which Phil Stokes previously analyzed. My goal is to show that with this tool the analysis is easier and we can look into the capabilities of the sample deeper
+Now that we’ve validated the tool against XCSSET, let’s try it on something where the original source is unknown. We'll try the tool with [OSAMiner samples](e-dead-adventures-in-reversing-malicious-run-only-applescripts/), which Phil Stokes previously analyzed. My goal is to show that this tool makes analysis easier and lets us look more deeply into the capabilities of the samples.
 
-We are going to be analyzing the [OSAMiner.zip](https://github.com/objective-see/Malware/blob/main/OSAMiner.zip). The filenames references in this section is from that zip.
+We are going to be analyzing the [OSAMiner.zip](https://github.com/objective-see/Malware/blob/main/OSAMiner.zip). The filename references in this section are from that zip.
 
 #### Anti-analysis and anti-sandbox
 
-We analyze `com.apple.4V.plist` and wee see that it employs some logic to:
-- decrypt strings during runtime
-- has a bunch of checks to see to evade detection and analysis
+We analyze com.apple.4V.plist and we see that it employs some logic to:
+- decrypt strings at runtime
+- perform a bunch of checks to evade detection and analysis
 
 ##### Decrypting Strings
 
 
-Decrypting this, we are able to see `d(_s)` and `e(_s)`
+Decompiling `com.apple.4V.plist`, we are able to see `d(_s)` and `e(_s)`
 
 ![](/assets/posts/20251214/09-d-and-e.png)
 
@@ -282,9 +282,9 @@ Here we just go through some samples with obfuscation in them.
 
 #### Variable substitution
 
-We look it `888.scpt`. This was something that I encountered in a [previous blog post](https://pberba.github.io/security/2025/11/11/macos-infection-vector-applescript-bypass-gatekeeper/). The [888.scpt](https://www.virustotal.com/gui/file/c6dae9481354466531c186421dda521cbedc72c0bf32ba8d49f6eee2cbf2477f/) is a run-only script.
+We look at `888.scpt`. This was something that I encountered in a [previous blog post](https://pberba.github.io/security/2025/11/11/macos-infection-vector-applescript-bypass-gatekeeper/). The [888.scpt](https://www.virustotal.com/gui/file/c6dae9481354466531c186421dda521cbedc72c0bf32ba8d49f6eee2cbf2477f/) is a run-only script.
 
-The decompiled script isn’t very complicated, but it is obfuscated with variables substitutions.
+The decompiled script isn’t very complicated, but it is obfuscated with variable substitutions.
 
 ![](/assets/posts/20251214/21-888.png)
 *obfuscates the URL for the 2nd stage DMG*
@@ -292,7 +292,7 @@ The decompiled script isn’t very complicated, but it is obfuscated with variab
 
 #### ASCII Character X 
 
-I've seen a bunch of compiled applscripts from samples like [app.macked.parallels-desktop.activation](https://www.virustotal.com/gui/file/2f5307d9e0d56baf454cd96c0dfa19e5eab9d2d5843b359220d73d396f4135e9)
+I've seen a bunch of compiled AppleScripts from samples like [app.macked.parallels-desktop.activation](https://www.virustotal.com/gui/file/2f5307d9e0d56baf454cd96c0dfa19e5eab9d2d5843b359220d73d396f4135e9)
 
 Peeking into them, we can see that their scripts are obfuscated with `(ASCII Character X)`. 
 
@@ -313,7 +313,7 @@ With the analyzer, the `ukkc` output is also automatically deobfuscated.
 
 
 `NaiveStringAnalyzer` works by finding numeric literals that might be ASCII
-and converting them into single characters. And then we override the rendering of a lists and concatenate all the strings together.
+and converting them into single characters. And then we override the rendering of lists and concatenate all the strings together.
 
 ### Building a decompiler
 
@@ -340,7 +340,7 @@ In the same way that Java has its JVM and the java-bytecode, I _assume_ that App
 
 For now, we need a `runtime_stack`. For any operation:
 1. We push values to the stack that serve as inputs for future operations
-2. When an operation is performed, the operands (or arguements) are popped from the stack
+2. When an operation is performed, the operands (or arguments) are popped from the stack
 3. The result is pushed back into the stack
 
 ```python
@@ -354,7 +354,7 @@ add_result = l_operand + r_operand
 runtime_stack.push(add_result)
 ```
 
-This might be fine if we want to just emulate the VM. However, because we want to decompile it, we need to retain all the logic. To do this, we need to define and use Abstract Syntax Tree (AST), to represent certain operations rather than performing them.
+This might be fine if we want to just emulate the VM. However, because we want to decompile it, we need to retain all the logic. To do this, we need to define and use an Abstract Syntax Tree (AST) to represent certain operations rather than performing them.
 
 ```python
 runtime_stack.push(1) # Push1
@@ -370,7 +370,7 @@ runtime_stack.push(BinaryOp(
 ))
 ```
 
-Let's use a more complicated expression
+Now let’s use a more complicated expression.
 
 ![](/assets/posts/20251214/d01-basic-expression-2.png)
 
