@@ -207,6 +207,8 @@ With something equivalent to `log stream --predicate 'subsystem=="com.apple.appl
 | Fake Password Prompt     | `syso,dlog`, `givu=150`, `dtxt=utxt(0\/$)`, `htxt=true(0\/$)` |
 | Volume Muted via osascript | `aevt,stvl*mute=true(0/$)` |
 | Clipboard Data Collection via osascript | `Jons,gClp` | 
+| Obfuscation using `(ASCII Character X)` | repeated uses `syso,ntoc` | 
+| Run Hidden TMP Script from `tmp` | `syso,dsct`  with `2f0074006d0070002f002e00` |
 
 Similar detections can be made with the other techniques if we enable private data, you may also want to filter for `cloneForCompatability` in your predicate. I've only focused on ASCII text since most of the `utxt` in `cloneForCompatability` are already in the `event={}` and `reply={}` logs.
 
@@ -232,6 +234,85 @@ As the project is still in its early days, the AppleScript produced by the tool 
 **How stable is this? Is it possible that the format of the Apple events debug output would change?**
 
 Hopefully it stays stable 🤞. A similar approach to this is [PhorionTech/Kronos](https://github.com/PhorionTech/Kronos) which monitors the TCC debug logs, and they did mention minor changes in the format of the logs (see: [The Clock is TCCing](https://objectivebythesea.org/v6/talks/OBTS_v6_lRoberts_cHall.pdf)). Looking around, we can find [debug output](https://stackoverflow.com/questions/53621146/get-apple-events-from-applescript#comment94136801_53621226) from 7 years ago and it doesn't seem like it has changed since.
+
+#### Example: Converting YARA rules into detections 
+
+Recently Apple released some updates on to XProtect that included some rules with AppleScript. Let's take two examples and see 
+
+##### MACOS.OSASCRIPT.DUENHA
+
+```yara
+rule XProtect_MACOS_OSASCRIPT_DUENHA {
+    meta:
+        description = "MACOS.OSASCRIPT.DUENHA"
+        uuid = "BD3F3491-8A81-43C4-84F7-23CB3DFC4931"
+        interpreter = "osascript"
+
+    strings:
+        # "=$(echo ?? |"
+        $a0 = { FF F3 00 ?? 03 FF F2 00 3D 03 FF F1 00 24 03 FF F0 00 28 03 FF EF 00 65 03 FF EE 00 63 03 FF ED 00 68 03 FF EC 00 6F 03 FF EB 00 20 03 FF EA 00 ?? 03 FF E9 00 7C 03 } 
+        # "base64
+        $a1 = { FF E0 00 62 03 FF DF 00 61 03 FF DE 00 73 03 FF DD 00 36 03 FF DC 00 34 03 FF DB }
+        $a2 = "sysodsct"
+        $a3 = "sysoexec"
+
+    condition:
+        OSACompiled and all of them and filesize < 1MB
+}
+```
+
+This tries to detect an obfuscation technique using [ASCII Character X](https://pberba.github.io/security/2025/12/14/decompiling-run-only-applescripts/#ascii-character-x) which I've shown ITW example previously. Luckily, this results in an Apple event!
+
+Running something like
+```
+do shell script (ASCII character 117) & (ASCII character 110) & (ASCII character  97) & (ASCII character  109) & (ASCII character  101)
+```
+
+We see 
+
+![](/assets/posts/20260221/06-obfuscation.png)
+
+Repeated usage of `syso,ntoc` prior to `do shell script` or `run script` could be a red flag for obfuscation.
+
+##### MACOS.OSASCRIPT.DUAP
+
+
+```yara
+rule XProtect_MACOS_OSASCRIPT_DUAP {
+    meta:
+        description = "MACOS.OSASCRIPT.DUAP"
+        uuid = "6EF56AD6-B1B7-4C7A-AB07-6AFA01303173"
+        interpreter = "osascript"
+
+    strings:
+        $a0 = { 74 00 6d 00 70 00 3a 00 2e 00 ?? 0a } # /tmp/.
+        $a1 = "sysodsct"
+
+    condition:
+        OSACompiled and all of them and filesize < 1MB
+}
+```
+
+Running a script like `osascript -e "run script \"/tmp/test.scpt\""` we get the following event from the enriched Unified Log
+
+```json
+{
+    "processImagePath": "/usr/bin/osascript",
+    "eventMessage": "sendToSelf(), event={syso,dsct target='psn '[osascript] {----=utxt(30/$2f0074006d0070002f002e0074006500730074002e007300630070007400)} attr:{subj=NULL-impl,csig=65536} returnID=-30919} reply=0xNULL-impl sendMode=1043 timeout=7199",
+    "appleEvent":
+    {
+        "event":
+        {
+            "raw": "{syso,dsct target='psn '[osascript] {----=utxt(30/$2f0074006d0070002f002e0074006500730074002e007300630070007400)} attr:{subj=NULL-impl,csig=65536} returnID=-30919}",
+            "return_id": -30919,
+            "applescript": "run script \"/tmp/.test.scpt\""
+        }
+    }
+}
+```
+
+We could look for `syso,dsct`  with `2f0074006d0070002f002e00` 
+
 
 ### Appendix: How to hide from the command line
 
@@ -301,6 +382,8 @@ A recent in-the-wild example would be [Odyssey Stealer samples](https://censys.c
 ```bash
 osascript -e 'run script "run script \"\" & return & \"on f3368611526666962209(p6418423763347269161)\" & return & ...'
 ```
+
+I've discussed more examples of obfuscation from samples I've analyzed in [Obfuscation Techniques used by samples](https://pberba.github.io/security/2025/12/14/decompiling-run-only-applescripts/#demo-obfuscation-techniques-used-by-samples).
 
 
 #### Acknowledgements 
