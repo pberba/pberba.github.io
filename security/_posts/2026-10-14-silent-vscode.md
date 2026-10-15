@@ -182,7 +182,7 @@ The `metadata` block is more interesting. There are a lot more fields but here a
 - `source`: set to `vsix` if installed from file, `gallery` if installed from the marketplace
 - `isBuiltin`: marks this as a `@builtin` extension
 
-The `isBuiltin` flag is particularly interesting because when enabled, **it seems to become hidden from the extension list**. In my tests, when running `code --list-extensions`, the newly installed built-in extension will not be listed. You can only find it by searching the `@builtin` extensions or by insepcting `extensions.json` directly.
+The `isBuiltin` flag is particularly interesting because when enabled, **it seems to become hidden from the extension list**. You can only find it by searching the `@builtin` extensions or by insepcting `extensions.json` directly.
 
 ![](/assets/posts/20261014/02-builtin.png)
 
